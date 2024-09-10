@@ -74,6 +74,15 @@ public:
         m_points = points;
     }
 
+// set points and calculate
+public:
+    void calculate_at_points(const std::vector<point_2d> points)
+    {
+        this->set_points(points);
+        this->resize_arrays();
+        this->fill_datas();
+    }
+
 // resize arrays
 private:
     void resize_arrays(index_type size)
@@ -143,6 +152,68 @@ public:
             }
         )
     }
+
+// block of functions that provides acsess to calculated values
+public:
+    value_type get_a11(index_type i)
+    {
+        return a11[i];
+    } 
+    
+public:
+    value_type get_a12(index_type i)
+    {
+        return a12[i];
+    } 
+
+public:
+    value_type get_a21(index_type i)
+    {
+        return a21[i];
+    } 
+
+public:
+    value_type get_a22(index_type i)
+    {
+        return a22[i];
+    } 
+
+public:
+    value_type get_b1(index_type i)
+    {
+        return b1[i];
+    } 
+
+public:
+    value_type get_b2(index_type i)
+    {
+        return b2[i];
+    } 
+
+public:
+    value_type get_c1(index_type i)
+    {
+        return c1[i];
+    } 
+
+public:
+    value_type get_c2(index_type i)
+    {
+        return c2[i];
+    } 
+
+public:
+    value_type get_a(index_type i)
+    {
+        return a[i];
+    } 
+
+public:
+    value_type get_f(index_type i)
+    {
+        return f[i];
+    } 
+
 };
 
 } //

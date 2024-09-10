@@ -59,8 +59,52 @@ public:
 // 8. Edges Center List
     using edges_center_list_type = std::vector<point_2d>;
 
+public:
 // 9. Elements mass centers List
-    using elems_mass_centers_list = std::vector<point_2>;
+    using elems_mass_centers_list = std::vector<point_2d>;
+
+
+public:
+    nodes_list_type nodes;
+
+public:
+    edges_list_type edges;
+
+public:
+    triangles_list_type elements;
+
+public:
+    boundary_edges_list_type b_edges;
+
+public:
+    edges_length_list_type length_edges;
+
+public:
+    triangle_areas_list_type areas_triangle;
+
+public:
+    triangle_center_list_type centers_triangle;
+
+public:
+    edges_center_list_type centers_edges;
+
+public:
+    elems_mass_centers_list mass_centers_elems;
+
+
+public:
+    std::vector<point_2d> get_points_by_triangle_id(index_type idx)
+    {
+        // return vector of points of triangle
+    }
+
+public:
+    std::vector<point_2d> get_elements_mass_centers();
+
+// return global id of node with local index local_num_position at triangle_id
+public:
+    index_type get_global_node_id(index_type triangle_id, index_type local_num_position);
+
 };
 
 
