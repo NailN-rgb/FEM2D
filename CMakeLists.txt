@@ -55,13 +55,43 @@ message("CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
 message("CMAKE_CXX_FLAGS_RELWITHDEBINFO: " ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
 message("CMAKE_CXX_FLAGS_MINSIZEREL: " ${CMAKE_CXX_FLAGS_MINSIZEREL})
 
+set(TRIANGLEMESH_SOURCES
+        ${PROJECT_SOURCE_DIR}/mesh/trianglemesh/detail/trianglemesh.cpp
+)
 
-#executable stage
+set(TRIANGLE_SOURCES
+        ${PROJECT_SOURCE_DIR}/mesh/trianglemesh/detail/triangle/triangle.h
+        ${PROJECT_SOURCE_DIR}/mesh/trianglemesh/detail/triangle/triangle.c
+)
+
 set(TARGET_EXE_NAME main)
 
+set(TARGET_LIB_NAME FEM2D)
+
+add_library(${TARGET_LIB_NAME}
+        SHARED
+        ${TARGET_EXE_NAME}
+        ${TRIANGLEMESH_SOURCES}
+        ${TRIANGLE_SOURCES}
+)
+
+target_link_libraries(${TARGET_LIB_NAME} PRIVATE stdc++fs)
+
+
+#executable stage
 add_executable(${TARGET_EXE_NAME}
         main.cpp
+        ${TRIANGLEMESH_SOURCES}
+        ${TRIANGLE_SOURCES}
 )
+
+# FIXME: What is this?
+# install(
+#         TARGETS ${TARGET_EXE_NAME} ${TARGET_LIB_NAME}
+#         RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/.."
+#         LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/.."
+#         CONFIGURATIONS Debug
+# )
 
 # for code static analysis
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

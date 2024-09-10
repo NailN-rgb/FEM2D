@@ -25,10 +25,10 @@
 
 
 
-#include <polymesh/precompiled.h>
+#include <FEM2D/precompiled.h>
 
 
-namespace polymesh
+namespace FEM2D
 {
 
 namespace mesh
@@ -46,7 +46,7 @@ extern "C" {
 //#define	ANSI_DECLARATORS
 //#define VOID int
 
-#include <polymesh/mesh/trianglemesh/detail/triangle/triangle.h>
+#include <FEM2D/mesh/trianglemesh/detail/triangle/triangle.h>
 
 }
   
@@ -101,66 +101,6 @@ public:
 
 public:
 	bool refine_mesh(const std::string& triswitches);
-
-public:
-	bool write_msh2(const std::string& file);
-
-public:
-	bool read_mesh(const std::string& filename);
-
-public:
-	bool write_nodes(const std::string& nodefilename);
-	bool write_edges(const std::string& edgefilename);
-	bool write_elems(const std::string& elementsfilename);
-
-public:
-	template<typename json_type>
-	bool write_nodes(json_type& json);
-
-	template<typename json_type>
-	bool write_edges(json_type& json);
-
-	template<typename json_type>
-	bool write_elems(json_type& json);
-
-	template<typename json_type>
-	bool write_cells(json_type& json);
-
-public:
-	template<typename json_type>
-	json_type write_nodes_();
-
-	template<typename json_type>
-	json_type write_edges_();
-	
-	template<typename json_type>
-	json_type write_elems_();
-
-	template<
-		typename json_type,
-		typename polygon_type
-	>
-	json_type write_cells_(const polygon_type& boundary);
-
-public:
-	bool write_msh2 (std::stringstream& outfile);
-	bool write_nodes(std::stringstream& outfile);
-	bool write_edges(std::stringstream& outfile);
-	bool write_elems(std::stringstream& outfile);
-
-public:
-	bool mesh_syntax()
-	{
-		//syntax();
-		return true;
-	};
-	
-public:
-	bool mesh_info()
-	{
-		//info();
-		return true;
-	};
 	
 protected:
     void init(triangulateio& t);
@@ -179,8 +119,8 @@ protected:
 
 } //namespace mesh
 
-} //namespace polymesh
+} //namespace FEM2D
 
-#include<polymesh/mesh/trianglemesh/detail/trianglemesh.inl>
+#include<FEM2D/mesh/trianglemesh/detail/trianglemesh.inl>
 
 #endif // __TRIANGLEMESH__

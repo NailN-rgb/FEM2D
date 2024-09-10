@@ -71,7 +71,7 @@ public:
     void create_convex_hull_points(vector_of_values x, vector_of_values y);
 
 public:
-    void erase_non_polygon_points();
+    bool erase_non_polygon_points();
 
 };
 

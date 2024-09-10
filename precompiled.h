@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <exception>
 
+#include <memory>
+
 #include <cmath>
 #include <ctime>
 

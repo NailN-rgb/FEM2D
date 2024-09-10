@@ -41,7 +41,7 @@ template<
 
         index_type number_of_points      = m_points_field.points.size();
         index_type current_point_index   = 1;
-        index_type current_segment_index = 1;
+        // index_type current_segment_index = 1;
         
         //set header of file
         PolyFile << number_of_points << "   2   0   1" << "\n";
@@ -58,8 +58,10 @@ template<
             }
         );
 
-        index_type num_segments = 
+        // index_type num_segments = 
 
+
+        return true;
     }
     catch(const std::exception& e)
     {
@@ -68,6 +70,8 @@ template<
             std::string(e.what())
         );
     }
+
+    return false;
 }
 
 
@@ -93,6 +97,8 @@ template<
         {
             throw std::runtime_error("triangle mesh coult not be build");
         }
+
+        return true;
     }
     catch(const std::exception& e)
     {
@@ -101,6 +107,8 @@ template<
             std::string(e.what()) 
         );
     }
+
+    return false;
 }
 
 
@@ -113,6 +121,8 @@ template<
     {
         this->write_mesh_to_vtk();
     }
+
+    return true;
 }
 
 
@@ -122,6 +132,8 @@ template<
 > bool Mesh_builder<IndexType, ValueType>::write_mesh_to_vtk()
 {
     // TODO: add code here
+
+    return true;
 }
 
 

@@ -26,17 +26,7 @@ template<
 
         std::string solver_type = "FEM";
 
-        switch(solver_type)
-        {
-            case "FEM"
-                break;
-
-            case "HGD"
-                break;
-
-            case "FVM"
-                break;
-        }
+        // TODO: Code to start solver 
 
     }
     catch(const std::exception& e)

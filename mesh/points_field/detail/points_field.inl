@@ -79,9 +79,9 @@ template<
     vector_of_values y
 )
 {
-    for(index_type i = 0; i < x.size(); i++)
+    for(size_t i = 0; i < x.size(); i++)
     {
-        for(index_type j = 0; j < y.size(); j++)
+        for(size_t j = 0; j < y.size(); j++)
         {
             points.push_back(
                 point_2d(
@@ -97,7 +97,7 @@ template<
 template<
     typename IndexType,
     typename ValueType
-> void Points_field<IndexType, ValueType>::erase_non_polygon_points()
+> bool Points_field<IndexType, ValueType>::erase_non_polygon_points()
 {
     //remove points out of boundary
     line_2d line(boundary.outer().begin(), boundary.outer().end());
