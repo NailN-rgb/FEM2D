@@ -10,8 +10,6 @@ namespace mesh
 namespace trianglemesh
 {
 
-
-
 } //namespace trianglemesh
 
 } //namespace mesh

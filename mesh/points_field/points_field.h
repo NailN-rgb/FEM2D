@@ -26,6 +26,8 @@ public:
     using box_2d       = typename bg::geo<value_type>::box_2d;
     using line_2d      = typename bg::geo<value_type>::line_2d;
 
+    using equal_points = typename bg::geo<value_type>::equal_points;
+
 public:
     using edge_t = std::tuple<index_type, index_type>;
 
@@ -68,10 +70,15 @@ public:
     };
 
 public:
-    void create_convex_hull_points(vector_of_values x, vector_of_values y);
+    void create_convex_hull_points(
+        const vector_of_values &x,
+        const vector_of_values &y);
 
 public:
     bool erase_non_polygon_points();
+
+public:
+    bool get_points_at_boundary();
 
 };
 
