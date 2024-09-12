@@ -303,7 +303,7 @@ bool TriangleMesh::read_poly(std::stringstream& PolyFile)
 		);
 
 	//Read arrays from .node file
-	for (int i = 0, index; i< in_.numberofpoints; ++i)
+	for (int i = 0, index; i < in_.numberofpoints; ++i)
 	{
 		PolyFile >> index;
 		

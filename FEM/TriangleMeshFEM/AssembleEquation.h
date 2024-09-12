@@ -10,7 +10,8 @@
 
 
 // class for assemble FEM system by given mesh
-
+namespace FEM2D
+{
 namespace solvers
 {
 
@@ -93,5 +94,6 @@ private:
 
 };
 
+} //
 } //
 } //

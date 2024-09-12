@@ -26,6 +26,8 @@
 
 
 #include <FEM2D/precompiled.h>
+#include <FEM2D/mesh/boost_datatypes/types.h>
+
 
 
 namespace FEM2D
@@ -49,9 +51,13 @@ extern "C" {
 #include <FEM2D/mesh/trianglemesh/detail/triangle/triangle.h>
 
 }
+
+namespace bg = boost::geometry;
   
 class TRIANGLEMESH_DLL_API TriangleMesh
 {
+public:
+	using point_2d = typename bg::geo<double>::point_2d;
 protected:
 	enum IO_Type 
 	{
@@ -111,6 +117,54 @@ protected:
     bool read_nodes(const std::string& filename);
     bool read_edges(const std::string& filename);
     bool read_ele(const std::string& filename); 
+
+public:
+	std::vector<point_2d> get_points_list(const triangulateio &io)
+	{
+		std::vector<point_2d> points_list;
+
+		for(auto pt = io.pointlist; pt != io.pointlist + 2 * io.numberofpoints; pt+=2)
+		{
+			points_list.push_back(point_2d(*pt, *(pt + 1)));
+		}
+
+		return points_list;
+	}
+
+public:
+	std::vector<std::vector<int>> get_segments_list(const triangulateio &io)
+	{
+		std::vector<std::vector<int>> segments_list;
+
+		for(auto pt = io.edgelist; pt != io.edgelist + 2 * io.numberofedges; pt+=2)
+		{
+			std::vector<int> segment;
+			segment.push_back(*pt);
+			segment.push_back(*(pt + 1));
+
+			segments_list.push_back(segment);
+		}
+
+		return segments_list;
+	}
+
+public:
+	std::vector<std::vector<int>> get_triangle_list(const triangulateio &io)
+	{
+		std::vector<std::vector<int>> tri_list;
+
+		for(auto pt = io.trianglelist; pt < io.trianglelist + io.numberofcorners * io.numberoftriangles; pt+=3)
+		{
+			std::vector<int> tri;
+			tri.push_back(*pt);
+			tri.push_back(*(pt + 1));
+			tri.push_back(*(pt + 2));
+
+			tri_list.push_back(tri);
+		}
+
+		return tri_list;
+	}
     
 };//class TriangleMesh 
 

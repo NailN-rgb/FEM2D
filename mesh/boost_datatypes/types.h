@@ -21,7 +21,16 @@ namespace geometry
         typedef model::polygon<point_2d>    polygon_2d;
         typedef model::segment<point_2d>    segment_2d;
         typedef model::box<point_2d>        box_2d;
+
+        struct equal_points
+        {
+		bool operator()(const point_2d& p1, const point_2d& p2) const
+		{
+			return ((fabs(p1.x() - p2.x()) < 1.e-6) && (fabs(p1.y() - p2.y()) < 1.e-6));
+		};
+        };
     };
+
 }
 }
 
