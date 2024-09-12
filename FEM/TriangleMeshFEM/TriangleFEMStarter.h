@@ -6,8 +6,11 @@
 
 #include <FEM2D/FEM/TriangleMeshFEM/AssembleEquation.h>
 
+#include <FEM2D/mesh/mesh_types/mesh_base.h>
+
 namespace FEM2D
 {
+
 namespace solvers
 {
 
@@ -25,16 +28,20 @@ public:
     using value_type = ValueType;
 
 public:
-    using ell_equation_type = FEM2D::Equation::EllepticEquation<index_type, value_type>;
+    using ell_equation_type = FEM2D::equation::EllepticEquation<index_type, value_type>;
 
 public:
     using equation_assembler_type = FEM2D::solvers::TriFem::AssembleEquation<index_type, value_type>;
 
 public:
-    ell_equation_type elliptic_equation; // TODO: give points to ctor 
+    using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
+    using mesh_type_pointer = std::unique_ptr<mesh_type>;
 
-public:
-    equation_assembler_type assembler; 
+private:
+    ell_equation_type m_elliptic_equation;
+
+private:
+    equation_assembler_type m_assembler; 
 
     // constructor
 
@@ -45,21 +52,24 @@ public:
 
 // main solving function
 public:
-    void solve();
+    void solve(
+        int solving_algorithm,
+        const mesh_type_pointer &mesh_data
+    );
 
+// call & complete equation initializer
 public:
-    void set_elliptic_equation();
-    // call & complete equation initializer
-
-    // call & complete matrix/RHS builder 
+    void set_elliptic_equation(
+        const mesh_type_pointer &mesh_data
+    );
+    
+// call & complete matrix/RHS builder 
 public:
-    void get_fem_system()
-    {
-        assembler.set_equation_params(); // TODO
-        assembler.assemble_equation();
-    }
+    void get_fem_system(
+        const mesh_type_pointer &mesh_data
+    ); 
 
-    // call Equation System solver
+// call Equation System solver
 public:
     void solve();
 
@@ -69,3 +79,4 @@ public:
 } //
 } //
 
+#include <FEM2D/FEM/TriangleMeshFEM/detail/TriangleFEMStarter.inl>

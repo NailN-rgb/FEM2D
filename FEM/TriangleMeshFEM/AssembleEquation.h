@@ -7,6 +7,7 @@
 
 #include <FEM2D/mesh/mesh_types/mesh_base.h> // include trimesh
 
+#include <FEM2D/mesh/boost_datatypes/types.h>
 
 
 // class for assemble FEM system by given mesh
@@ -17,6 +18,8 @@ namespace solvers
 
 namespace TriFem
 {
+
+namespace bg = boost::geometry;
 
 template<
     typename IndexType,
@@ -29,11 +32,16 @@ public:
     using value_type = ValueType;
 
 public:
-    using ell_equation_type = FEM2D::Equation::EllepticEquation<index_type, value_type>;
+    using point_2d = typename bg::geo<value_type>::point_2d;
 
-// pointer to mesh
+// mess type
 public:
-    using trimesh_type = std::unique_ptr<FEM2D::mesh::mesh_types::MeshBase<index_type, value_type>>;
+    using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
+    using mesh_type_pointer = std::unique_ptr<mesh_type>;
+
+public:
+    using ell_equation_type = FEM2D::equation::EllepticEquation<index_type, value_type>;
+    using ell_equation_pointer_type = std::unique_ptr<ell_equation_type>;
 
 // boost compressed matrix
 public:
@@ -48,22 +56,10 @@ public:
     using basis_grads_list_type = boost::numeric::ublas::matrix<value_type>;
 
 private:
-    ell_equation_type m_equation;
-
-private:
-    trimesh_type m_trimesh;
-
-private:
     sparse_matrix_type m_global_matrix;
 
 private:
     sparse_vector_type m_global_vector;
-
-private:
-    index_type N_points;
-
-private:
-    index_type N_triangles;
 
 // degree of freedom
 private:
@@ -74,26 +70,32 @@ public:
     AssembleEquation(const AssembleEquation& ae) = default;
     ~AssembleEquation() = default;
 
+// class algorithms entry function
 public:
-    void set_equation_params();
+    bool assemble_equation(
+        const mesh_type_pointer &mesh_data,
+        const ell_equation_type &ell_equation
+    );
 
-public:
-    void assemble_equation();
-
+// get global matrix & rhs
 private:
-    void create_equation_system();
+    bool create_equation_system(
+        const mesh_type_pointer &mesh_data,
+        const ell_equation_type &equation
+    );
 
+// get graidents of basis funcs
 private:
     boost::numeric::ublas::matrix<double> get_basis_gradients_on_element(
-        std::unique_ptr<FEM2D::mesh::mesh_types::MeshBase<index_type, value_type>> trimesh,
+        const mesh_type_pointer &trimesh,
         const basis_grads_list_type &grads,
         index_type triangle_index
     );
     
-
-
 };
 
 } //
 } //
 } //
+
+#include <FEM2D/FEM/TriangleMeshFEM/detail/AssembleEquation.inl>

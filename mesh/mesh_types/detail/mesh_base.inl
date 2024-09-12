@@ -151,6 +151,22 @@ template<
     );
 }
 
+
+template<
+    typename IndexType,
+    typename ValueType
+> 
+typename MeshBase<IndexType, ValueType>::nodes_list_type 
+MeshBase<IndexType, ValueType>::get_points_by_triangle_id(index_type idx)
+{
+    nodes_list_type result;
+    for(index_type i = 0; i < 3; i++)
+    {
+        result.push_back(m_nodes[m_elements[idx][i]]);
+    }
+}
+
+
 } //
 } //
 } //
