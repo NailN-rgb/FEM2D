@@ -3,6 +3,9 @@
 #include <FEM2D/precompiled.h>
 #include <FEM2D/mesh/mesh_types/mesh_base.h>
 
+namespace FEM2D
+{
+
 namespace mesh
 {
     
@@ -12,7 +15,7 @@ namespace mesh_types
 template<
     typename IndexType,
     typename ValueType
-> bool MeshBase<IndexType, ValueType>::parse(triangle_mesh_pointer trimesh)
+> bool MeshBase<IndexType, ValueType>::parse(const triangle_mesh_pointer &trimesh)
 {
     try
     {
@@ -42,6 +45,8 @@ template<
     this->get_triangle_centers();
     this->get_edges_centers();
     this->get_triangles_mass_centers();
+
+    return true;
 }
 
 
@@ -63,7 +68,7 @@ template<
     std::for_each(
         m_edges.begin(),
         m_edges.end(),
-        [&this](std::vector<index_type> edge)
+        [this](std::vector<index_type> edge)
         {
             m_length_edges.push_back(
                 get_line_length(m_nodes[edge[0]], m_nodes[edge[1]])
@@ -113,13 +118,13 @@ template<
     std::for_each(
         m_edges.begin(),
         m_edges.end(),
-        [&this](std::vector<index_type> edge)
+        [this](std::vector<index_type> edge)
         {
             m_centers_edges.push_back(
                 point_2d(
                     (m_nodes[edge[0]].x() + m_nodes[edge[1]].x()) / 2,
                     (m_nodes[edge[0]].y() + m_nodes[edge[1]].y()) / 2
-                );
+                )
             );
         }
     );
@@ -134,17 +139,18 @@ template<
     std::for_each(
         m_elements.begin(),
         m_elements.end(),
-        [&this](std::vector<index_type> triangle)
+        [this](std::vector<index_type> triangle)
         {
             m_mass_centers_elems.push_back(
                 point_2d(
                     (m_nodes[triangle[0]].x() + m_nodes[triangle[1]].x() + m_nodes[triangle[2]].x()) / 3,
                     (m_nodes[triangle[0]].y() + m_nodes[triangle[1]].y() + m_nodes[triangle[2]].y()) / 3
-                );
+                )
             );
         }
     );
 }
 
+} //
 } //
 } //

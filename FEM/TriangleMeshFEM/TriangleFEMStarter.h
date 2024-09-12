@@ -6,6 +6,8 @@
 
 #include <FEM2D/FEM/TriangleMeshFEM/AssembleEquation.h>
 
+namespace FEM2D
+{
 namespace solvers
 {
 
@@ -41,6 +43,10 @@ public:
     TriangleFEMStarter(const TriangleFEMStarter& trifem) = default;
     ~TriangleFEMStarter() = default;
 
+// main solving function
+public:
+    void solve();
+
 public:
     void set_elliptic_equation();
     // call & complete equation initializer
@@ -59,6 +65,7 @@ public:
 
 };
 
+} //
 } //
 } //
 

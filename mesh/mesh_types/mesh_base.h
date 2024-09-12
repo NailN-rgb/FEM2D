@@ -2,6 +2,9 @@
 
 #include <FEM2D/precompiled.h>
 
+namespace FEM2D
+{
+
 namespace mesh
 {
     
@@ -104,7 +107,7 @@ public:
 
 // set nodes, edges, triangles 
 public:
-    bool parse(triangle_mesh_pointer trimesh);
+    bool parse(const triangle_mesh_pointer &trimesh);
 
 // get additional mesh data
 public:
@@ -133,7 +136,7 @@ public:
 public:
     value_type get_line_length(const point_2d& p1, const point_2d& p2)
     {
-        return std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p2.x, 2));
+        return std::sqrt(std::pow(p2.x() - p1.x(), 2) + std::pow(p2.y() - p2.x(), 2));
     }
 
 };
@@ -141,3 +144,6 @@ public:
 
 } //
 } //
+} //
+
+#include <FEM2D/mesh/mesh_types/detail/mesh_base.inl>

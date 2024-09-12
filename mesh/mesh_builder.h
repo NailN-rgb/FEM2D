@@ -33,7 +33,7 @@ public:
 public:
     using points_field_type = typename FEM2D::points_field::Points_field<IndexType, ValueType>;
     using triangle_mesh_t   = FEM2D::mesh::trianglemesh::TriangleMesh;
-    using mesh_type         = FEM2D::mesh::mesh_type::MeshBase<IndexType, ValueType>;
+    using mesh_type         = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
 
     using triangle_mesh_pointer = std::unique_ptr<triangle_mesh_t>; 
     using mesh_type_pointer     = std::unique_ptr<mesh_type>;
@@ -63,7 +63,7 @@ public:
     void parse();
 
 public:
-    mesh_type_pointer save_mesh();
+    mesh_type_pointer save_mesh(bool form_vtk);
 
 public:
     bool write_mesh_to_vtk();
@@ -72,7 +72,7 @@ public:
     bool create_poly_file(std::stringstream& PolyFile);
 
 public:
-    bool build_mesh(bool form_vtk);
+    mesh_type_pointer build_mesh(bool form_vtk);
 
 public:
     bool build_mesh();

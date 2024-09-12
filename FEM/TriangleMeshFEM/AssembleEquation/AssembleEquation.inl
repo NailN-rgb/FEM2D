@@ -3,6 +3,13 @@
 
 #include <FEM2D/FEM/TriangleMeshFEM/AssembleEquation.h> 
 
+namespace FEM2D
+{
+namespace solvers
+{
+
+namespace TriFem
+{
 
 template<
     typename IndexType,
@@ -113,4 +120,6 @@ template<
     }
 }
 
-
+} //
+} //
+} //

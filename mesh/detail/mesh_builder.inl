@@ -8,7 +8,9 @@ namespace mesh
 template<
     typename IndexType,
     typename ValueType
-> bool Mesh_builder<IndexType, ValueType>::build_mesh(bool form_vtk)
+> 
+typename Mesh_builder<IndexType, ValueType>::mesh_type_pointer
+Mesh_builder<IndexType, ValueType>::build_mesh(bool form_vtk)
 {
     this->parse();
     this->build_mesh();
@@ -150,8 +152,9 @@ template<
 template<
     typename IndexType,
     typename ValueType
-> std::unique_ptr<FEM2D::mesh::mesh_type::MeshBase<IndexType, ValueType>>
-  Mesh_builder<IndexType, ValueType>::save_mesh(bool form_vtk)
+> 
+typename Mesh_builder<IndexType, ValueType>::mesh_type_pointer
+Mesh_builder<IndexType, ValueType>::save_mesh(bool form_vtk)
 {
     try
     {
@@ -161,7 +164,7 @@ template<
         }
         else
         {
-            throw std::runtime_error("Mesh data's reading error")
+            throw std::runtime_error("Mesh data's reading error");
         }
 
         if(form_vtk)
@@ -175,7 +178,7 @@ template<
     }
     
 
-    return std::make_unique<m_base_mesh>;
+    return std::make_unique<mesh_type>(m_base_mesh);
 }
 
 

@@ -140,7 +140,7 @@ template<
     boundary.clear();
 
     // loop by boundary segments
-    for(index_type i = 0; i < polygon_points.size() - 1; i++)
+    for(size_t i = 0; i < polygon_points.size() - 1; i++)
     {
         point_2d first_pt = polygon_points[i];
         point_2d second_pt = polygon_points[i + 1];
@@ -163,6 +163,8 @@ template<
             bg::append(boundary.outer(), point_2d(x, y));
         }
     }
+
+    return true;
 }
 
 } //
