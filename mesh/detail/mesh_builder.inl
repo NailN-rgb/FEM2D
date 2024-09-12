@@ -4,6 +4,17 @@ namespace FEM2D
 
 namespace mesh
 {
+
+template<
+    typename IndexType,
+    typename ValueType
+> bool Mesh_builder<IndexType, ValueType>::build_mesh(bool form_vtk)
+{
+    this->parse();
+    this->build_mesh();
+
+    return save_mesh(form_vtk);
+}
     
 template<
     typename IndexType,
@@ -139,14 +150,32 @@ template<
 template<
     typename IndexType,
     typename ValueType
-> bool Mesh_builder<IndexType, ValueType>::save_mesh()
+> std::unique_ptr<FEM2D::mesh::mesh_type::MeshBase<IndexType, ValueType>>
+  Mesh_builder<IndexType, ValueType>::save_mesh(bool form_vtk)
 {
-    if(true)
+    try
     {
-        this->write_mesh_to_vtk();
-    }
+        if(m_base_mesh.parse(m_triangle_mesh))
+        {
+            m_base_mesh.calculate_mesh_params();
+        }
+        else
+        {
+            throw std::runtime_error("Mesh data's reading error")
+        }
 
-    return true;
+        if(form_vtk)
+        {
+            this->write_mesh_to_vtk();
+        }
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("Mesh_builder::save_mesh:: " + std::string(e.what()));
+    }
+    
+
+    return std::make_unique<m_base_mesh>;
 }
 
 
@@ -157,6 +186,7 @@ template<
 {
     try
     {
+        // take this data from m_mesh_base
         std::vector<point_2d> mesh_points = m_triangle_mesh->get_points_list(m_triangle_mesh->in_);
 
         std::vector<std::vector<index_type>> mesh_segments = m_triangle_mesh->get_segments_list(m_triangle_mesh->in_);

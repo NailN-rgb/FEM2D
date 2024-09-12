@@ -18,8 +18,8 @@ template<
         bg::append(boundary.outer(), point_2d(0., 1.));
         bg::append(boundary.outer(), point_2d(0., 0.));
 
-        hx = 0.3;
-        hy = 0.3;
+        hx = 0.1;
+        hy = 0.1;
 
         return true;
     }
@@ -46,16 +46,16 @@ template<
     vector_of_values x(nx - 1);
     vector_of_values y(ny - 1);
 
-    x[0] = left_low.x() + hx;
+    x[0] = left_low.x() + hx / 2 ;
 
-    for(index_type i = 1; i < nx - 1; i++)
+    for(index_type i = 1; i < nx; i++)
     {
         x[i] = x[i - 1] + hx;
     }
 
-    y[0] = left_low.y() + hy;
+    y[0] = left_low.y() + hy / 2;
 
-    for(index_type i = 1; i < ny - 1; i++)
+    for(index_type i = 1; i < ny; i++)
     {
         y[i] = y[i - 1] + hy;
     }
@@ -63,11 +63,13 @@ template<
     // create points at boundary
     get_points_at_boundary();
 
+    erase_non_polygon_points();
+
     // generate points inside convex hull
     create_convex_hull_points(x, y);
 
     // remove points outside polygon
-    // erase_non_polygon_points();
+    
 
     return true;
 }
@@ -133,7 +135,7 @@ template<
 {
     std::vector<point_2d> polygon_points = boundary.outer();
 
-    auto step = (hx + hy) / 2 * std::sqrt(2);
+    auto step = (hx + hy) / 2; // * std::sqrt(2);
 
     boundary.clear();
 
