@@ -25,6 +25,17 @@ template<
 
     this->create_equation_system(mesh_data, ell_equation);
 
+    this->assemble_boundary_conditions(mesh_data);
+
+    // TODO: #ifdef
+    std::ofstream ofs_m("global_matrix.txt");
+    ofs_m << m_global_matrix;
+    ofs_m.close();
+
+    std::ofstream ofs_v("global_vector.txt");
+    ofs_v << m_global_vector;
+    ofs_v.close();
+    
     return true;
 }
 
@@ -89,7 +100,6 @@ template<
             local_rhs(0) = triangle_area * equation.get_f(e) / 3;
 
             // assemble local matrixes into global
-            // TODO: realize this
             
             this->assemble_matrix(local_matrix, mesh_data->get_node_id(e));
             this->assemble_vector(local_rhs, mesh_data->get_node_id(e));
@@ -149,7 +159,8 @@ template<
             for(index_type j = 0; j < m_dof; j++)
             {
                 value_type val = local_matr(i, j);
-                m_global_matrix(global_indeces[i], global_indeces[j]) += val;
+                // we need '-1' for transition from triangle lib numeration to C++ arrays numeration
+                m_global_matrix(global_indeces[i] - 1, global_indeces[j] - 1) += val;
             }
         }
     }
@@ -172,7 +183,7 @@ template<
     {
         for(index_type i = 0; i < m_dof; i++)
         {
-            m_global_vector(global_indeces[i]) += local_vec(i);
+            m_global_vector(global_indeces[i] - 1) += local_vec(i);
         }
     }
     catch(const std::exception& e)
@@ -181,6 +192,11 @@ template<
     }
 }
 
+
+
 } //
 } //
 } //
+
+
+#include <FEM2D/FEM/TriangleMeshFEM/detail/BoundaryConditions.inl>

@@ -70,8 +70,14 @@ public:
 // 9. Elements mass centers List
     using elems_mass_centers_list = std::vector<point_2d>;
 
+// 10. Node boundary condition type
+    using nodes_bc_list_type = std::vector<index_type>;
+
 public:
     nodes_list_type m_nodes;
+
+public:
+    nodes_bc_list_type m_bc_nodes;
 
 public:
     edges_list_type m_edges;
@@ -125,6 +131,9 @@ public:
 // class getters
 public:
     nodes_list_type get_points() { return m_nodes; }
+
+public:
+    nodes_bc_list_type get_bc_markers() { return m_bc_nodes; }
 
 public:
     edges_list_type get_edges() { return m_edges; }

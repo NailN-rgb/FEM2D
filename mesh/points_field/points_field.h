@@ -36,12 +36,14 @@ public:
     using vector_of_values  = std::vector<value_type>;
 
     using vector_of_edges   = std::vector<edge_t>;
-    using vector_of_points  = std::vector<point_2d>;
+    using vector_of_points  = std::vector<std::pair<point_2d, bool>>;
+
 
 public:
     polygon_2d boundary;
     vector_of_edges edge_vector;
     vector_of_points points;
+    std::vector<bool> is_boundary_point;
 public:
     value_type hx;
     value_type hy;

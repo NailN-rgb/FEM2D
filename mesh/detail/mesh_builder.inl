@@ -57,16 +57,17 @@ template<
         // index_type current_segment_index = 1;
         
         //set header of file
-        PolyFile << number_of_points << "   2   0   0" << "\n";
+        PolyFile << number_of_points << "   2   0   1" << "\n";
 
         std::for_each(
             m_points_field.points.begin(),
             m_points_field.points.end(),
-            [&](point_2d point)
+            [&](const std::pair<point_2d, bool> &point)
             {
                 PolyFile << current_point_index++ << "\t"
-                         << static_cast<value_type>(point.x()) << "\t"
-                         << static_cast<value_type>(point.y()) << "\t"
+                         << static_cast<value_type>(point.first.x()) << "\t"
+                         << static_cast<value_type>(point.first.y()) << "\t"
+                         << static_cast<index_type>(point.second)
                          << "\n";
             }
         );
@@ -75,13 +76,14 @@ template<
         index_type number_of_segments = m_points_field.boundary.outer().size();
         index_type current_segment_number = 0;
 
-        PolyFile << "\n" << number_of_segments << " 0" << "\n";
+        PolyFile << "\n" << number_of_segments << " 1" << "\n";
 
         for(index_type i = 0; i < number_of_segments - 1; i++)
         {
             PolyFile << ++current_segment_number << "\t"
                      << i + 1 << "\t"
-                     << i + 2 << "\t"
+                     << i + 2 << "\t" 
+                     << 1
                      << "\n"; 
         }
 
@@ -117,7 +119,8 @@ template<
     try
     {
         // turn off output
-        std::string triangle_switches("-pqe");
+        // programm will fall if we dont have 'e' key
+        std::string triangle_switches("-peq");
 
         std::stringstream poly_file;
 

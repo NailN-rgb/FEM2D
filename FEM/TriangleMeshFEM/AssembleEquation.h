@@ -46,6 +46,7 @@ public:
     using ell_equation_pointer_type = std::unique_ptr<ell_equation_type>;
 
 // boost compressed matrix
+// TODO: is really sparse?
 public:
     using sparse_matrix_type = boost::numeric::ublas::compressed_matrix<value_type>; 
 
@@ -64,6 +65,9 @@ private:
 
 private:
     sparse_vector_type m_global_vector;
+
+private:
+    vector_type solution;
 
 // degree of freedom
 private:
@@ -103,10 +107,9 @@ private:
     bool assemble_vector(const vector_type& local_vector, const std::vector<index_type> &global_indeces);
 
 private:
-    bool assenble_boundary_conditions(
+    bool assemble_boundary_conditions(
         const mesh_type_pointer &trimesh
     );
-
 
 };
 
