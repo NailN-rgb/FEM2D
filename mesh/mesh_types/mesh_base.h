@@ -149,7 +149,10 @@ public:
 
 // return global id of node with local index local_num_position at triangle_id
 public:
-    index_type get_global_node_id(index_type triangle_id, index_type local_num_position);
+    std::vector<index_type> get_node_id(index_type triangle_id)
+    {
+        return m_elements[triangle_id];
+    }
 
 public:
     value_type get_line_length(const point_2d& p1, const point_2d& p2)

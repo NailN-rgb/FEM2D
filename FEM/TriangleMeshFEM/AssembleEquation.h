@@ -2,8 +2,10 @@
 
 #include <FEM2D/precompiled.h>
 
+#include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_sparse.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 #include <FEM2D/mesh/mesh_types/mesh_base.h> // include trimesh
 
@@ -52,8 +54,10 @@ public:
     using sparse_vector_type = boost::numeric::ublas::compressed_vector<value_type>; 
 
 public:
-// 1-Point FEM basis functions gradients
-    using basis_grads_list_type = boost::numeric::ublas::matrix<value_type>;
+    using matrix_type = boost::numeric::ublas::matrix<value_type>;
+
+public:
+    using vector_type = boost::numeric::ublas::vector<value_type>;
 
 private:
     sparse_matrix_type m_global_matrix;
@@ -88,10 +92,22 @@ private:
 private:
     boost::numeric::ublas::matrix<double> get_basis_gradients_on_element(
         const mesh_type_pointer &trimesh,
-        const basis_grads_list_type &grads,
-        index_type triangle_index
-    );
+        const std::vector<point_2d> &triangle_points,
+        value_type tri_area
+        );
     
+private:
+    bool assemble_matrix(const matrix_type& local_matrix, const std::vector<index_type> &global_indeces);
+
+private:
+    bool assemble_vector(const vector_type& local_vector, const std::vector<index_type> &global_indeces);
+
+private:
+    bool assenble_boundary_conditions(
+        const mesh_type_pointer &trimesh
+    );
+
+
 };
 
 } //

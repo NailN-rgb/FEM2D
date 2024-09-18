@@ -164,6 +164,8 @@ MeshBase<IndexType, ValueType>::get_points_by_triangle_id(index_type idx)
     {
         result.push_back(m_nodes[m_elements[idx][i]]);
     }
+
+    return result;
 }
 
 
