@@ -16,8 +16,13 @@ namespace TriFem
 template<
     typename IndexType,
     typename ValueType
-> bool AssembleEquation<IndexType, ValueType>::assemble_boundary_conditions(
-    const mesh_type_pointer &trimesh
+> 
+template<
+    typename ell_equation_type
+>
+bool AssembleEquation<IndexType, ValueType>::assemble_boundary_conditions(
+    const mesh_type_pointer &trimesh,
+    const ell_equation_type &ell_equation
 )
 {
     // TODO: relalize robin's bc assembling
@@ -34,6 +39,7 @@ template<
             if(point_index == 1)
             {
                 assemble_first_bc(node_idx);
+                m_solution(point_index) = ell_equation.get_sol(point_index);
             }
             else if(point_index == 3)
             {
@@ -60,7 +66,23 @@ void AssembleEquation<IndexType, ValueType>::assemble_first_bc(index_type node_i
 {
     try
     {
+        // TODO: make it vectorized
+        // TODO: correct rhs
 
+        // loop by unassembled matrix
+        for(index_type i = 0; i < m_nodes_count; i++)
+        {
+            // go trough matrix col
+            if(i == node_idx)
+            {
+                m_global_matrix(node_idx, node_idx) = 1.;
+            }
+            else
+            {
+                m_global_matrix(node_idx, i) = 0.;
+                m_global_matrix(i, node_idx) = 0.;
+            }
+        }
     }
     catch(const std::exception &e)
     {

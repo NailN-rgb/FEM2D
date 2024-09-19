@@ -77,7 +77,7 @@ public:
     nodes_list_type m_nodes;
 
 public:
-    nodes_bc_list_type m_bc_nodes;
+    nodes_bc_list_type m_node_markers;
 
 public:
     edges_list_type m_edges;
@@ -133,7 +133,7 @@ public:
     nodes_list_type get_points() { return m_nodes; }
 
 public:
-    nodes_bc_list_type get_bc_markers() { return m_bc_nodes; }
+    nodes_bc_list_type get_bc_markers() { return m_node_markers; }
 
 public:
     edges_list_type get_edges() { return m_edges; }
@@ -167,6 +167,26 @@ public:
     value_type get_line_length(const point_2d& p1, const point_2d& p2)
     {
         return std::sqrt(std::pow(p2.x() - p1.x(), 2) + std::pow(p2.y() - p2.x(), 2));
+    }
+
+public:
+    index_type get_dirichlet_bc_count()
+    {
+        index_type diriclet_nodes = 0;
+
+        std::for_each(
+            m_node_markers.begin(),
+            m_node_markers.end(),
+            [](index_type marker)
+            {
+                if(marker == 1)
+                {
+                    diriclet_nodes++;
+                }
+            }
+        );
+
+        return direchlet_nodes;
     }
 
 };

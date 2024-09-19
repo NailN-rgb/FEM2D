@@ -53,6 +53,9 @@ public:
 public:
     std::vector<value_type> f;
 
+public:
+    std::vector<value_type> solution;
+
 // input values point
 public:
     std::vector<point_2d> m_points;
@@ -114,6 +117,8 @@ private:
 
             a.resize(size);
             f.resize(size);
+
+            solution.resize(size);
         }
         catch(const std::exception& e)
         {
@@ -140,6 +145,8 @@ private:
         a.clear();
         
         f.clear();
+
+        solution.clear();
     }
 
 
@@ -164,6 +171,9 @@ public:
 public:
     value_type f_f(value_type x, value_type y) {return 1.; }
 
+public:
+    value_type sol_f(value_type x, value_type y) {return 1.; }
+
 // return a1 vals matrix
 public:
     void fill_datas()
@@ -187,6 +197,8 @@ public:
 
                 a[idx]   = f_a(p.x(), p.y());
                 f[idx]   = f_f(p.x(), p.y());
+
+                solution[idx] = sol_f(p.x(), p.y());
 
                 idx++;
             }
@@ -253,6 +265,12 @@ public:
     {
         return f[i];
     } 
+
+public:
+    value_type get_sol(index_type i)
+    {
+        return solution[i];
+    }
 
 };
 

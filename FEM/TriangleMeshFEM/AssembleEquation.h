@@ -67,11 +67,26 @@ private:
     sparse_vector_type m_global_vector;
 
 private:
-    vector_type solution;
+    vector_type m_solution;
+
+private:
+    sparse_matrix_type m_assembled_matrix;
+
+private:
+    sparse_vector_type m_assembled_vector;
+
+private:
+    vector_type m_assembled_solution;
 
 // degree of freedom
 private:
     index_type m_dof = 3;
+
+private:
+    index_type m_nodes_count;
+
+private:
+    index_type m_elems_count;
 
 public:
     AssembleEquation() = default;

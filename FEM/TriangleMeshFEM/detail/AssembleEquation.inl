@@ -20,12 +20,17 @@ template<
     const ell_equation_type &ell_equation
 )
 {
-    m_global_matrix.resize(mesh_data->get_nodes_size(), mesh_data->get_nodes_size(), 0);
-    m_global_vector.resize(mesh_data->get_nodes_size(), 0);
+    // init arrays
+    m_nodes_count = mesh_data->get_nodes_size();
+    index_type dirichlet_bc_count = mesh_data->get_dirichlet_bc_count();
+
+    m_global_matrix.resize(nodes_count, nodes_count, 0);
+    m_global_vector.resize(nodes_count, 0);
+    m_solution.resize(nodes_count, 0);
 
     this->create_equation_system(mesh_data, ell_equation);
 
-    this->assemble_boundary_conditions(mesh_data);
+    this->assemble_boundary_conditions(mesh_data, ell_equation);
 
     // TODO: #ifdef
     std::ofstream ofs_m("global_matrix.txt");
