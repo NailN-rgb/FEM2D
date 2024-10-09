@@ -35,6 +35,10 @@ template<
         this->assemble_boundary_conditions(mesh_data, ell_equation);
 
         // solve
+
+        // print solution
+
+        FEM2D::Plot::TestPlot();
         
         // TODO: #ifdef
         std::ofstream ofs_m("global_matrix.txt");

@@ -12,6 +12,8 @@
 
 #include <FEM2D/mesh/boost_datatypes/types.h>
 
+// for visualization
+#include <FEM2D/plot/plot_graphs.h>
 
 // class for assemble FEM system by given mesh
 namespace FEM2D

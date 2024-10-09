@@ -24,6 +24,7 @@ else ()
     message("Could not found Boost library!" FATAL_ERROR)
 endif ()
 
+
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
 
@@ -44,6 +45,10 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCPU86")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif ()
+
+find_package(PythonLibs REQUIRED)
+find_package(Python2 REQUIRED)
+include_directories(${Python3_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPOLYMESH2D_EXPORTS -DTRIANGLEMESH_EXPORTS")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_CPP")
@@ -75,8 +80,9 @@ add_library(${TARGET_LIB_NAME}
         ${TRIANGLE_SOURCES}
 )
 
-target_link_libraries(${TARGET_LIB_NAME} PRIVATE stdc++fs)
+include_directories(${PYTHON_INCLUDE_DIRS})
 
+target_link_libraries(${TARGET_LIB_NAME} PRIVATE stdc++fs)
 
 #executable stage
 add_executable(${TARGET_EXE_NAME}
@@ -85,16 +91,4 @@ add_executable(${TARGET_EXE_NAME}
         ${TRIANGLE_SOURCES}
 )
 
-target_link_libraries(${TARGET_EXE_NAME} armadillo)
-
-# FIXME: What is this?
-# install(
-#         TARGETS ${TARGET_EXE_NAME} ${TARGET_LIB_NAME}
-#         RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/.."
-#         LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/.."
-#         CONFIGURATIONS Debug
-# )
-
-# for code static analysis
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
+target_link_libraries(${TARGET_EXE_NAME} PRIVATE armadillo -lpython3.5m)
