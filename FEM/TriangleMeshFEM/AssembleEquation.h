@@ -49,35 +49,20 @@ public:
 // boost compressed matrix
 // TODO: is really sparse?
 public:
-    using sparse_matrix_type = boost::numeric::ublas::compressed_matrix<value_type>; 
+    using matrix_type = arma::mat; 
 
 // boost compressed vector
 public:
-    using sparse_vector_type = boost::numeric::ublas::compressed_vector<value_type>; 
-
-public:
-    using matrix_type = boost::numeric::ublas::matrix<value_type>;
-
-public:
-    using vector_type = boost::numeric::ublas::vector<value_type>;
+    using vector_type = arma::vec; 
 
 private:
-    sparse_matrix_type m_global_matrix;
+    matrix_type m_global_matrix;
 
 private:
-    sparse_vector_type m_global_vector;
+    vector_type m_global_vector;
 
 private:
     vector_type m_solution;
-
-private:
-    sparse_matrix_type m_assembled_matrix;
-
-private:
-    sparse_vector_type m_assembled_vector;
-
-private:
-    vector_type m_assembled_solution;
 
 // degree of freedom
 private:
@@ -110,7 +95,7 @@ private:
 
 // get graidents of basis funcs
 private:
-    boost::numeric::ublas::matrix<double> get_basis_gradients_on_element(
+    arma::mat get_basis_gradients_on_element(
         const mesh_type_pointer &trimesh,
         const std::vector<point_2d> &triangle_points,
         value_type tri_area

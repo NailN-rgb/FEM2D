@@ -85,6 +85,8 @@ add_executable(${TARGET_EXE_NAME}
         ${TRIANGLE_SOURCES}
 )
 
+target_link_libraries(${TARGET_EXE_NAME} armadillo)
+
 # FIXME: What is this?
 # install(
 #         TARGETS ${TARGET_EXE_NAME} ${TARGET_LIB_NAME}

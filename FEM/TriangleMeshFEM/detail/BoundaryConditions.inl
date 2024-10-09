@@ -72,35 +72,20 @@ void AssembleEquation<IndexType, ValueType>::assemble_first_bc(
         // TODO: make it vectorized
         // TODO: correct rhs
 
-        // loop by rows
-        // TODO: Use template 
-        for(typename sparse_matrix_type::iterator1 it1 = m_global_matrix.begin1();
-               it1 != m_global_matrix.end1(); ++it1)
+        for(index_type i = 0; i < m_nodes_count; i++)
         {
-            if(nodes.count(it1.index1()) > 0)
+            // if node have a Dirichlet bc marker 
+            if(nodes.count(i) > 0)
             {
-                // loop by columns
-                for(typename sparse_matrix_type::iterator2 it2 = it1.begin();
-                        it2 != it1.end(); ++it2)
-                {
-                    if (it2.index2() != it1.index1()) // Проверка, что это не элемент на главной диагонали
-                    {
-                        *it2 = 0.0; // Обнуление элемента
-                    }
-                    else // Если это элемент на главной диагонали
-                    {
-                        *it2 = 1.0; // Установка элемента равным 1
-                    }
-                }
-            }
-        }
+                arma::rowvec row(m_nodes_count);
 
+                vector_type col(m_nodes_count);
+                col(i) = 1;
 
-        for(typename sparse_vector_type::iterator it = m_global_vector.begin(); it != m_global_vector.end(); ++it)
-        {
-            if(nodes.count(it.index()) > 0)
-            {
-                *it = ell_equation.get_sol(it.index());
+                m_global_matrix.row(i) = row;
+                m_global_matrix.col(i) = col;
+
+                m_global_vector(i) = ell_equation.get_sol(i);
             }
         }
 
@@ -108,7 +93,7 @@ void AssembleEquation<IndexType, ValueType>::assemble_first_bc(
     }
     catch(const std::exception &e)
     {
-        throw std::runtime_error("Error to assemble first bc");
+        throw std::runtime_error("Error to assemble first bc" + std::string(e.what()));
     }
 }
 

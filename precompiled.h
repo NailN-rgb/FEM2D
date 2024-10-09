@@ -39,4 +39,5 @@
 #include <interpolation.h>
 #include <dataanalysis.h>
 
-// BLAS
+// armadillo
+#include <armadillo> 
