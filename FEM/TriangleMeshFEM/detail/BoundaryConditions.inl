@@ -2,8 +2,6 @@
 
 #include <FEM2D/precompiled.h>
 
-#include <FEM2D/FEM/TriangleMeshFEM/TriangleFEMStarter.h>
-
 namespace FEM2D
 {
 
@@ -17,31 +15,29 @@ template<
     typename IndexType,
     typename ValueType
 > 
-template<
-    typename ell_equation_type
->
 bool AssembleEquation<IndexType, ValueType>::assemble_boundary_conditions(
     const mesh_type_pointer &trimesh,
     const ell_equation_type &ell_equation
 )
 {
     // TODO: relalize robin's bc assembling
-    std::vector<index_type> boundary_markers = trimesh->get(get_bc_markers);
+    std::vector<index_type> boundary_markers = trimesh->get_bc_markers();
 
     // 1 - Dirichle't boundary cond, 3 - Robin's boundary cond
+
+    std::unordered_set<index_type> first_bc_points;
 
     index_type node_idx = 0;
     std::for_each(
         boundary_markers.begin(),
         boundary_markers.end(),
-        [&](index_type point_index)
+        [&](index_type point_marker)
         {
-            if(point_index == 1)
+            if(point_marker == 1)
             {
-                assemble_first_bc(node_idx);
-                m_solution(point_index) = ell_equation.get_sol(point_index);
+                first_bc_points.insert(node_idx);
             }
-            else if(point_index == 3)
+            else if(point_marker == 3)
             {
                 assemble_third_bc(node_idx);
             }
@@ -52,8 +48,11 @@ bool AssembleEquation<IndexType, ValueType>::assemble_boundary_conditions(
 
             node_idx++;
         }
-    )
+    );
 
+    assemble_first_bc(first_bc_points, ell_equation);
+
+    return true;
 }
 
 
@@ -62,31 +61,54 @@ template<
     typename IndexType,
     typename ValueType
 >
-void AssembleEquation<IndexType, ValueType>::assemble_first_bc(index_type node_idx)
+template<typename NodesList>
+void AssembleEquation<IndexType, ValueType>::assemble_first_bc(
+    NodesList nodes,
+    const ell_equation_type &ell_equation
+)
 {
     try
     {
         // TODO: make it vectorized
         // TODO: correct rhs
 
-        // loop by unassembled matrix
-        for(index_type i = 0; i < m_nodes_count; i++)
+        // loop by rows
+        // TODO: Use template 
+        for(typename sparse_matrix_type::iterator1 it1 = m_global_matrix.begin1();
+               it1 != m_global_matrix.end1(); ++it1)
         {
-            // go trough matrix col
-            if(i == node_idx)
+            if(nodes.count(it1.index1()) > 0)
             {
-                m_global_matrix(node_idx, node_idx) = 1.;
-            }
-            else
-            {
-                m_global_matrix(node_idx, i) = 0.;
-                m_global_matrix(i, node_idx) = 0.;
+                // loop by columns
+                for(typename sparse_matrix_type::iterator2 it2 = it1.begin();
+                        it2 != it1.end(); ++it2)
+                {
+                    if (it2.index2() != it1.index1()) // Проверка, что это не элемент на главной диагонали
+                    {
+                        *it2 = 0.0; // Обнуление элемента
+                    }
+                    else // Если это элемент на главной диагонали
+                    {
+                        *it2 = 1.0; // Установка элемента равным 1
+                    }
+                }
             }
         }
+
+
+        for(typename sparse_vector_type::iterator it = m_global_vector.begin(); it != m_global_vector.end(); ++it)
+        {
+            if(nodes.count(it.index()) > 0)
+            {
+                *it = ell_equation.get_sol(it.index());
+            }
+        }
+
+        std::cout << "First BC assembled" << std::endl;
     }
     catch(const std::exception &e)
     {
-        throw std::runtime_error("Error to assemble first bc at " std::string(node_idx) + " node");
+        throw std::runtime_error("Error to assemble first bc");
     }
 }
 
@@ -95,7 +117,8 @@ template<
     typename IndexType,
     typename ValueType
 >
-void AssembleEquation<IndexType, ValueType>::assemble_third_bc(index_type node_idx)
+template<typename NodesList>
+void AssembleEquation<IndexType, ValueType>::assemble_third_bc(NodesList nodes)
 {
     try
     {
@@ -103,7 +126,7 @@ void AssembleEquation<IndexType, ValueType>::assemble_third_bc(index_type node_i
     }
     catch(const std::exception &e)
     {
-        throw std::runtime_error("Error to assemble third bc at " std::string(node_idx) + " node");
+        throw std::runtime_error("Error to assemble third bc");
     }
 }
 

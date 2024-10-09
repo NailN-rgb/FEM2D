@@ -6,6 +6,7 @@
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/operation.hpp>
 
 #include <FEM2D/mesh/mesh_types/mesh_base.h> // include trimesh
 
@@ -123,8 +124,20 @@ private:
 
 private:
     bool assemble_boundary_conditions(
-        const mesh_type_pointer &trimesh
+        const mesh_type_pointer &trimesh,
+        const ell_equation_type &ell_equation
     );
+
+private:
+    template<typename NodesList>
+    void assemble_first_bc(
+        NodesList nodes,
+        const ell_equation_type &ell_equation
+    );
+
+private:
+    template<typename NodesList>
+    void assemble_third_bc(NodesList nodes);
 
 };
 
@@ -133,3 +146,4 @@ private:
 } //
 
 #include <FEM2D/FEM/TriangleMeshFEM/detail/AssembleEquation.inl>
+#include <FEM2D/FEM/TriangleMeshFEM/detail/BoundaryConditions.inl>

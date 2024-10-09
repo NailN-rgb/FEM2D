@@ -23,7 +23,7 @@ template<
         m_nodes = trimesh->get_points_list(trimesh->in_);
 
         //get boundary nodes attributes
-        m_bc_nodes = trimesh->get_boundary_attributes(trimesh->in_);
+        m_node_markers = trimesh->get_boundary_attributes(trimesh->in_);
 
         // get edges
         m_edges = trimesh->get_segments_list(trimesh->in_);

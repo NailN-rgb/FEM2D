@@ -177,7 +177,7 @@ public:
         std::for_each(
             m_node_markers.begin(),
             m_node_markers.end(),
-            [](index_type marker)
+            [&diriclet_nodes](index_type marker)
             {
                 if(marker == 1)
                 {
@@ -186,7 +186,7 @@ public:
             }
         );
 
-        return direchlet_nodes;
+        return diriclet_nodes;
     }
 
 };
