@@ -83,18 +83,40 @@ template<
     const vector_of_values &y
 )
 {
-    points.insert(points.begin(), boundary.outer().begin(), boundary.outer().end());
+    std::for_each(
+        boundary.outer().begin(),
+        boundary.outer().end(),
+        [this](auto p)
+        {
+            points.push_back(
+                {p, true}
+            );
+        }
+    );
+
+    // points.insert(points.begin(), boundary.outer().begin(), boundary.outer().end());
 
     for(size_t i = 0; i < x.size(); i++)
     {
         for(size_t j = 0; j < y.size(); j++)
         {
             points.push_back(
-                point_2d(
-                    x[i],
-                    y[j]
-                )
+                { point_2d(x[i], y[j]), false }
             );
+        }
+    }
+
+    // fill boundary marker vector
+    // TODO: optimize this
+    for(index_type i = 0; i < points.size(); i++)
+    {
+        if(i < boundary.outer().size())
+        {
+            is_boundary_point.push_back(true);
+        }
+        else
+        {
+            is_boundary_point.push_back(false);
         }
     }
 }
@@ -113,11 +135,11 @@ template<
         std::remove_if(
             points.begin(),
             points.end(),
-            [&](point_2d& p)
+            [&](const std::pair<point_2d, bool>& p)
             {
                 return (
-                        !boost::geometry::within(p, boundary) || 
-                            boost::geometry::distance(p, line) < dist
+                        !boost::geometry::within(p.first, boundary) || 
+                            boost::geometry::distance(p.first, line) < dist
                         );
             }
         ),

@@ -1,5 +1,5 @@
 #include <FEM2D/mesh/mesh_builder.h>
-
+#include <FEM2D/FEM/TriangleMeshFEM/TriangleFEMStarter.h>
 
 namespace FEM2D
 {
@@ -20,7 +20,7 @@ template<
         auto mesh_ptr = mesh.build_mesh(true);
 
         FEM_solver_type fem_solver;
-        fem_solver.solve();
+        fem_solver.solve(1, mesh_ptr);
 
         // select solver type
 

@@ -2,11 +2,15 @@
 
 #include <FEM2D/precompiled.h>
 
+#include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_sparse.hpp>
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/operation.hpp>
 
 #include <FEM2D/mesh/mesh_types/mesh_base.h> // include trimesh
 
+#include <FEM2D/mesh/boost_datatypes/types.h>
 
 
 // class for assemble FEM system by given mesh
@@ -17,6 +21,8 @@ namespace solvers
 
 namespace TriFem
 {
+
+namespace bg = boost::geometry;
 
 template<
     typename IndexType,
@@ -29,13 +35,19 @@ public:
     using value_type = ValueType;
 
 public:
-    using ell_equation_type = FEM2D::Equation::EllepticEquation<index_type, value_type>;
+    using point_2d = typename bg::geo<value_type>::point_2d;
 
-// pointer to mesh
+// mess type
 public:
-    using trimesh_type = std::unique_ptr<FEM2D::mesh::mesh_types::MeshBase<index_type, value_type>>;
+    using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
+    using mesh_type_pointer = std::unique_ptr<mesh_type>;
+
+public:
+    using ell_equation_type = FEM2D::equation::EllepticEquation<index_type, value_type>;
+    using ell_equation_pointer_type = std::unique_ptr<ell_equation_type>;
 
 // boost compressed matrix
+// TODO: is really sparse?
 public:
     using sparse_matrix_type = boost::numeric::ublas::compressed_matrix<value_type>; 
 
@@ -44,14 +56,10 @@ public:
     using sparse_vector_type = boost::numeric::ublas::compressed_vector<value_type>; 
 
 public:
-// 1-Point FEM basis functions gradients
-    using basis_grads_list_type = boost::numeric::ublas::matrix<value_type>;
+    using matrix_type = boost::numeric::ublas::matrix<value_type>;
 
-private:
-    ell_equation_type m_equation;
-
-private:
-    trimesh_type m_trimesh;
+public:
+    using vector_type = boost::numeric::ublas::vector<value_type>;
 
 private:
     sparse_matrix_type m_global_matrix;
@@ -60,40 +68,82 @@ private:
     sparse_vector_type m_global_vector;
 
 private:
-    index_type N_points;
+    vector_type m_solution;
 
 private:
-    index_type N_triangles;
+    sparse_matrix_type m_assembled_matrix;
+
+private:
+    sparse_vector_type m_assembled_vector;
+
+private:
+    vector_type m_assembled_solution;
 
 // degree of freedom
 private:
     index_type m_dof = 3;
+
+private:
+    index_type m_nodes_count;
+
+private:
+    index_type m_elems_count;
 
 public:
     AssembleEquation() = default;
     AssembleEquation(const AssembleEquation& ae) = default;
     ~AssembleEquation() = default;
 
+// class algorithms entry function
 public:
-    void set_equation_params();
+    bool assemble_equation(
+        const mesh_type_pointer &mesh_data,
+        const ell_equation_type &ell_equation
+    );
 
-public:
-    void assemble_equation();
-
+// get global matrix & rhs
 private:
-    void create_equation_system();
+    bool create_equation_system(
+        const mesh_type_pointer &mesh_data,
+        const ell_equation_type &equation
+    );
 
+// get graidents of basis funcs
 private:
     boost::numeric::ublas::matrix<double> get_basis_gradients_on_element(
-        std::unique_ptr<FEM2D::mesh::mesh_types::MeshBase<index_type, value_type>> trimesh,
-        const basis_grads_list_type &grads,
-        index_type triangle_index
-    );
+        const mesh_type_pointer &trimesh,
+        const std::vector<point_2d> &triangle_points,
+        value_type tri_area
+        );
     
+private:
+    bool assemble_matrix(const matrix_type& local_matrix, const std::vector<index_type> &global_indeces);
 
+private:
+    bool assemble_vector(const vector_type& local_vector, const std::vector<index_type> &global_indeces);
+
+private:
+    bool assemble_boundary_conditions(
+        const mesh_type_pointer &trimesh,
+        const ell_equation_type &ell_equation
+    );
+
+private:
+    template<typename NodesList>
+    void assemble_first_bc(
+        NodesList nodes,
+        const ell_equation_type &ell_equation
+    );
+
+private:
+    template<typename NodesList>
+    void assemble_third_bc(NodesList nodes);
 
 };
 
 } //
 } //
 } //
+
+#include <FEM2D/FEM/TriangleMeshFEM/detail/AssembleEquation.inl>
+#include <FEM2D/FEM/TriangleMeshFEM/detail/BoundaryConditions.inl>

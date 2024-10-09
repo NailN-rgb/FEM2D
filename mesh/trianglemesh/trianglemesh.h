@@ -131,6 +131,20 @@ public:
 		return points_list;
 	}
 
+
+public:
+	std::vector<int> get_boundary_attributes(const triangulateio &io)
+	{
+		std::vector<int> result;
+
+		for(auto pt_m = io.pointmarkerlist; pt_m != io.pointmarkerlist + io.numberofpoints; pt_m++)
+		{
+			result.push_back(*pt_m);
+		}
+
+		return result;
+	}
+
 public:
 	std::vector<std::vector<int>> get_segments_list(const triangulateio &io)
 	{
