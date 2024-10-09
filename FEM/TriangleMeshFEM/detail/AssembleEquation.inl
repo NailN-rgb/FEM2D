@@ -20,28 +20,36 @@ template<
     const ell_equation_type &ell_equation
 )
 {
-    // init arrays
-    m_nodes_count = mesh_data->get_nodes_size();
-    index_type dirichlet_bc_count = mesh_data->get_dirichlet_bc_count();
+    try
+    {
+        // init arrays
+        m_nodes_count = mesh_data->get_nodes_size();
+        index_type dirichlet_bc_count = mesh_data->get_dirichlet_bc_count();
 
-    m_global_matrix.resize(m_nodes_count, m_nodes_count, 0);
-    m_global_vector.resize(m_nodes_count, 0);
-    m_solution.resize(m_nodes_count, 0);
+        m_global_matrix.zeros(m_nodes_count, m_nodes_count);
+        m_global_vector.zeros(m_nodes_count);
+        m_solution.zeros(m_nodes_count);
 
-    this->create_equation_system(mesh_data, ell_equation);
+        this->create_equation_system(mesh_data, ell_equation);
 
-    this->assemble_boundary_conditions(mesh_data, ell_equation);
+        this->assemble_boundary_conditions(mesh_data, ell_equation);
 
-    // solve
+        // solve
+        
+        // TODO: #ifdef
+        std::ofstream ofs_m("global_matrix.txt");
+        ofs_m << m_global_matrix;
+        ofs_m.close();
+
+        std::ofstream ofs_v("global_vector.txt");
+        ofs_v << m_global_vector;
+        ofs_v.close();
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("AssembleEquation::assemble_equation::" + std::string(e.what()));
+    }
     
-    // TODO: #ifdef
-    std::ofstream ofs_m("global_matrix.txt");
-    ofs_m << m_global_matrix;
-    ofs_m.close();
-
-    std::ofstream ofs_v("global_vector.txt");
-    ofs_v << m_global_vector;
-    ofs_v.close();
     
     return true;
 }
@@ -127,13 +135,13 @@ template<
 template<
     typename IndexType,
     typename ValueType
-> boost::numeric::ublas::matrix<double> AssembleEquation<IndexType, ValueType>::get_basis_gradients_on_element(
+> arma::mat AssembleEquation<IndexType, ValueType>::get_basis_gradients_on_element(
     const mesh_type_pointer &trimesh,
     const std::vector<point_2d> &triangle_points,
     value_type tri_area
 )
 {
-    boost::numeric::ublas::matrix<double> basis_derivative_matrix(3, 2);
+    matrix_type basis_derivative_matrix(3, 2);
 
     // components of first basis function (a_3 - a_1)^ort / 2|e|
     basis_derivative_matrix(0, 0) = - (triangle_points[2].y() - triangle_points[0].y()) / (2 * tri_area);
