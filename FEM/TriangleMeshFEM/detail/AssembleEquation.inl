@@ -38,7 +38,7 @@ template<
 
         // print solution
 
-        FEM2D::Plot::TestPlot();
+        FEM2D::Plot::PlotMesh(mesh_data);
         
         // TODO: #ifdef
         std::ofstream ofs_m("global_matrix.txt");
