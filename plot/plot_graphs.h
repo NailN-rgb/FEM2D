@@ -32,7 +32,7 @@ void TestPlot()
     }
 
     matplotlibcpp::plot_surface(x, y, z);
-    const char* filename = "./basic.png";
+    const char* filename = "basic.png";
     std::cout << "Saving result to " << filename << std::endl;;
     matplotlibcpp::save(filename);
 }
@@ -89,14 +89,62 @@ bool PlotMesh(
             }
         );
 
-        const char* filename = "./TriangleMesh.png";
+        const char* filename = "TriangleMesh.png";
         matplotlibcpp::save(filename);
 
     }
     catch(const std::exception& e)
     {
         throw std::runtime_error("Error when plotting mesh: " + std::string(e.what()));
+        return false;
     }
+
+    return true;
+}
+
+
+template<
+    typename Vector,
+    typename MeshData
+> bool PlotSolution(
+    const Vector& solution,
+    const MeshData& mesh
+)
+{
+    try
+    {
+        using point_type = typename bg::geo<double>::point_2d;
+        using index_type = int;
+
+        // get mesh datas
+        auto points = mesh->get_points();
+        
+        Vector x(points.size());
+        Vector y(points.size());
+
+        // get points arrays
+        std::for_each(
+            points.begin(),
+            points.end(),
+            [&x, &y](const auto& point)
+            {
+                x.push_back(point.x());
+                y.push_back(point.y());
+            }
+        );
+
+        matplotlibcpp::plot_surface(x, y, solution);
+        const char* filename = "solution.png";
+        matplotlibcpp::save(filename);
+
+        return true;
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("PlotSolution: " + std:string(e.what()));
+    }
+
+    return true;
 }
 
 
