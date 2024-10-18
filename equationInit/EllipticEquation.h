@@ -151,28 +151,29 @@ private:
 
 
 // default values for functions
+// -div(A grad u + bu) + [c1,c2].grad u + au = f
 public:
-    value_type f_a11(value_type x, value_type y) { return 1.; }
-    value_type f_a12(value_type x, value_type y) { return 1.; }
-    value_type f_a21(value_type x, value_type y) { return 1.; }
-    value_type f_a22(value_type x, value_type y) { return 1.; }
+    value_type f_a11(value_type x, value_type y) { return -1.; }
+    value_type f_a12(value_type x, value_type y) { return -1.; }
+    value_type f_a21(value_type x, value_type y) { return -1.; }
+    value_type f_a22(value_type x, value_type y) { return -1.; }
 
 public:
-    value_type f_b1(value_type x, value_type y) {return 1.; }
-    value_type f_b2(value_type x, value_type y) {return 1.; }
+    value_type f_b1(value_type x, value_type y) {return 0; }
+    value_type f_b2(value_type x, value_type y) {return 0; }
 
 public:
-    value_type f_c1(value_type x, value_type y) {return 1.; }
-    value_type f_c2(value_type x, value_type y) {return 1.; }
+    value_type f_c1(value_type x, value_type y) {return 0; }
+    value_type f_c2(value_type x, value_type y) {return 0; }
 
 public:
-    value_type f_a(value_type x, value_type y) {return 1.; }
+    value_type f_a(value_type x, value_type y) {return (2.0 + std::sin(2.0 * (x + y))); }
 
 public:
-    value_type f_f(value_type x, value_type y) {return 1.; }
+    value_type f_f(value_type x, value_type y) {return 0; }
 
 public:
-    value_type sol_f(value_type x, value_type y) {return 1.; }
+    value_type sol_f(value_type x, value_type y) {return std::sin(2. * (x + y)); }
 
 // return a1 vals matrix
 public:

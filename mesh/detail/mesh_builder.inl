@@ -120,7 +120,7 @@ template<
     {
         // turn off output
         // programm will fall if we dont have 'e' key
-        std::string triangle_switches("-peq");
+        std::string triangle_switches("-pe");
 
         std::stringstream poly_file;
 

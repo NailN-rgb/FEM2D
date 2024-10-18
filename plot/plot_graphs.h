@@ -107,20 +107,19 @@ template<
     typename Vector,
     typename MeshData
 > bool PlotSolution(
-    const Vector& solution,
+    Vector& solution,
     const MeshData& mesh
 )
 {
     try
     {
         using point_type = typename bg::geo<double>::point_2d;
-        using index_type = int;
 
         // get mesh datas
         auto points = mesh->get_points();
         
-        Vector x(points.size());
-        Vector y(points.size());
+        Vector x;
+        Vector y;
 
         // get points arrays
         std::for_each(
@@ -133,7 +132,7 @@ template<
             }
         );
 
-        matplotlibcpp::plot_surface(x, y, solution);
+        matplotlibcpp::scatter(x, y, solution);
         const char* filename = "solution.png";
         matplotlibcpp::save(filename);
 
@@ -141,7 +140,7 @@ template<
     }
     catch(const std::exception& e)
     {
-        throw std::runtime_error("PlotSolution: " + std:string(e.what()));
+        throw std::runtime_error("PlotSolution: " + std::string(e.what()));
     }
 
     return true;

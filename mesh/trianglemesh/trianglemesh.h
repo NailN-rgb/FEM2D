@@ -153,8 +153,8 @@ public:
 		for(auto pt = io.edgelist; pt != io.edgelist + 2 * io.numberofedges; pt+=2)
 		{
 			std::vector<int> segment;
-			segment.push_back(*pt);
-			segment.push_back(*(pt + 1));
+			segment.push_back(*pt - 1);
+			segment.push_back(*(pt + 1) - 1);
 
 			segments_list.push_back(segment);
 		}
@@ -170,9 +170,9 @@ public:
 		for(auto pt = io.trianglelist; pt < io.trianglelist + io.numberofcorners * io.numberoftriangles; pt+=3)
 		{
 			std::vector<int> tri;
-			tri.push_back(*pt);
-			tri.push_back(*(pt + 1));
-			tri.push_back(*(pt + 2));
+			tri.push_back(*pt - 1);
+			tri.push_back(*(pt + 1) - 1);
+			tri.push_back(*(pt + 2) - 1);
 
 			tri_list.push_back(tri);
 		}

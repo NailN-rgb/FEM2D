@@ -18,8 +18,8 @@ template<
         bg::append(boundary.outer(), point_2d(0., 1.));
         bg::append(boundary.outer(), point_2d(0., 0.));
 
-        hx = 0.1;
-        hy = 0.1;
+        hx = 0.45;
+        hy = 0.45;
 
         return true;
     }
@@ -48,14 +48,14 @@ template<
 
     x[0] = left_low.x() + hx / 2 ;
 
-    for(index_type i = 1; i < nx; i++)
+    for(index_type i = 1; i < nx - 1; i++)
     {
         x[i] = x[i - 1] + hx;
     }
 
     y[0] = left_low.y() + hy / 2;
 
-    for(index_type i = 1; i < ny; i++)
+    for(index_type i = 1; i < ny - 1; i++)
     {
         y[i] = y[i - 1] + hy;
     }
@@ -70,6 +70,23 @@ template<
 
     // remove points outside polygon
     
+    // check point uniques
+    for(index_type i = 0; i < points.size(); i++)
+    {
+        for(index_type j = 0; j < points.size(); j++)
+        {
+            if(i != j)
+            {
+                if(
+                    (fabs(points[i].first.x() - points[j].first.x()) < 1.e-6) 
+                    && (fabs(points[i].first.y() - points[j].first.y()) < 1.e-6)
+                )
+                {
+                    std::cout << "Is equal" << std::endl;
+                }
+            }
+        }
+    }
 
     return true;
 }
@@ -95,7 +112,6 @@ template<
     );
 
     // points.insert(points.begin(), boundary.outer().begin(), boundary.outer().end());
-
     for(size_t i = 0; i < x.size(); i++)
     {
         for(size_t j = 0; j < y.size(); j++)

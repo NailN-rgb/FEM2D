@@ -34,20 +34,20 @@ template<
 
         this->assemble_boundary_conditions(mesh_data, ell_equation);
 
-        // solve
-
-        // print solution
-
-        FEM2D::Plot::PlotMesh(mesh_data);
-        
         // TODO: #ifdef
-        std::ofstream ofs_m("global_matrix.txt");
-        ofs_m << m_global_matrix;
-        ofs_m.close();
+        m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
 
-        std::ofstream ofs_v("global_vector.txt");
-        ofs_v << m_global_vector;
-        ofs_v.close();
+        m_global_vector.save("FEM vector.txt", arma::raw_ascii);
+        
+
+        // solve
+        m_solution = arma::solve(m_global_matrix, m_global_vector);
+
+        // print mesh & solution
+        FEM2D::Plot::PlotMesh(mesh_data);
+        FEM2D::Plot::PlotSolution(ell_equation.solution, mesh_data);
+        
+       
     }
     catch(const std::exception& e)
     {
@@ -80,7 +80,7 @@ template<
 
         // calculate equation Functions at triangle mass centres
         // 1. Set mass centers to equation
-        equation.calculate_at_points(mesh_data->m_mass_centers_elems);
+        //equation.calculate_at_points(mesh_data->m_mass_centers_elems);
 
         index_type N_triangles = mesh_data->get_elements_size();
 
@@ -122,6 +122,18 @@ template<
             
             this->assemble_matrix(local_matrix, mesh_data->get_node_id(e));
             this->assemble_vector(local_rhs, mesh_data->get_node_id(e));
+        }
+
+        if(!m_global_matrix.is_finite())
+        {
+            m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
+            throw std::runtime_error("global matrix have a infinite elem");
+        }
+
+        if(m_global_matrix.has_nan())
+        {
+            m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
+            throw std::runtime_error("global matrix have a nan- elem");
         }
 
         return true;
@@ -179,7 +191,7 @@ template<
             {
                 value_type val = local_matr(i, j);
                 // we need '-1' for transition from triangle lib numeration to C++ arrays numeration
-                m_global_matrix(global_indeces[i] - 1, global_indeces[j] - 1) += val;
+                m_global_matrix(global_indeces[i], global_indeces[j]) += val;
             }
         }
     }
