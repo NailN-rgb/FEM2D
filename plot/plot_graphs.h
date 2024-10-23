@@ -79,11 +79,11 @@ bool PlotMesh(
             segments.end(),
             [&x_edge, &y_edge, &points](const auto& edge_points)
             {
-                x_edge[0] = points[edge_points[0] - 1].x();
-                x_edge[1] = points[edge_points[1] - 1].x();
+                x_edge[0] = points[edge_points[0]].x();
+                x_edge[1] = points[edge_points[1]].x();
 
-                y_edge[0] = points[edge_points[0] - 1].y();
-                y_edge[1] = points[edge_points[1] - 1].y();
+                y_edge[0] = points[edge_points[0]].y();
+                y_edge[1] = points[edge_points[1]].y();
 
                 matplotlibcpp::plot(x_edge, y_edge, "r");
             }
@@ -106,7 +106,7 @@ bool PlotMesh(
 template<
     typename Vector,
     typename MeshData
-> bool PlotSolution(
+> bool PlotExplicitSolution(
     Vector& solution,
     const MeshData& mesh
 )
@@ -134,6 +134,54 @@ template<
 
         matplotlibcpp::scatter(x, y, solution);
         const char* filename = "solution.png";
+        matplotlibcpp::save(filename);
+
+        return true;
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("PlotSolution: " + std::string(e.what()));
+    }
+
+    return true;
+}
+
+
+template<
+    typename Vector,
+    typename MeshData
+> bool PlotSolution(
+    Vector& solution,
+    const MeshData& mesh
+)
+{
+    try
+    {
+        using point_type = typename bg::geo<double>::point_2d;
+
+        // get mesh datas
+        auto points = mesh->get_points();
+        
+        std::vector<double> x;
+        std::vector<double> y;
+
+        // get points arrays
+        std::for_each(
+            points.begin(),
+            points.end(),
+            [&x, &y](const auto& point)
+            {
+                x.push_back(point.x());
+                y.push_back(point.y());
+            }
+        );
+
+        matplotlibcpp::scatter(
+            x, 
+            y, 
+            arma::conv_to<std::vector<double>>::from(solution)
+        );
+        const char* filename = "solution_calculated.png";
         matplotlibcpp::save(filename);
 
         return true;

@@ -35,19 +35,32 @@ template<
         this->assemble_boundary_conditions(mesh_data, ell_equation);
 
         // TODO: #ifdef
-        m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
+        // m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
 
-        m_global_vector.save("FEM vector.txt", arma::raw_ascii);
+        // m_global_vector.save("FEM vector.txt", arma::raw_ascii);
         
 
         // solve
         m_solution = arma::solve(m_global_matrix, m_global_vector);
 
+        m_solution.save("Solution.txt", arma::raw_ascii);
+
+
+        vector_of_values expl_sol = ell_equation.solution;
+        vector_of_values calc_sol = arma::conv_to<std::vector<double>>::from(m_solution);
+
+        vector_of_values err;
+
+        for(int i = 0; i < expl_sol.size(); i++)
+        {
+            err.push_back(expl_sol[i] - calc_sol[i]);
+        }
+
         // print mesh & solution
         FEM2D::Plot::PlotMesh(mesh_data);
-        FEM2D::Plot::PlotSolution(ell_equation.solution, mesh_data);
+        FEM2D::Plot::PlotExplicitSolution(ell_equation.solution, mesh_data);
+        FEM2D::Plot::PlotSolution(m_solution, mesh_data);
         
-       
     }
     catch(const std::exception& e)
     {
@@ -116,7 +129,10 @@ template<
             }
 
             // get local rhs value
-            local_rhs(0) = triangle_area * equation.get_f(e) / 3;
+            value_type right_side = triangle_area * equation.get_f(e) / 3;
+            local_rhs(0) = right_side;
+            local_rhs(1) = right_side;
+            local_rhs(2) = right_side;
 
             // assemble local matrixes into global
             
@@ -124,8 +140,12 @@ template<
             this->assemble_vector(local_rhs, mesh_data->get_node_id(e));
         }
 
+        m_global_matrix.save("Unassembled", arma::raw_ascii);
+        m_global_vector.save("Unassembled V", arma::raw_ascii);
+
         if(!m_global_matrix.is_finite())
         {
+            // TODO: assert?
             m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
             throw std::runtime_error("global matrix have a infinite elem");
         }
@@ -160,14 +180,14 @@ template<
     matrix_type basis_derivative_matrix(3, 2);
 
     // components of first basis function (a_3 - a_1)^ort / 2|e|
-    basis_derivative_matrix(0, 0) = - (triangle_points[2].y() - triangle_points[0].y()) / (2 * tri_area);
-    basis_derivative_matrix(0, 1) =   (triangle_points[2].x() - triangle_points[0].x()) / (2 * tri_area);
+    basis_derivative_matrix(0, 0) = - (triangle_points[2].y() - triangle_points[1].y()) / (2 * tri_area);
+    basis_derivative_matrix(0, 1) =   (triangle_points[2].x() - triangle_points[1].x()) / (2 * tri_area);
     
-    // components of first basis function (a_3 - a_1)^ort / 2|e|
+    // components of first basis function (a_1 - a_2)^ort / 2|e|
     basis_derivative_matrix(1, 0) = - (triangle_points[0].y() - triangle_points[2].y()) / (2 * tri_area);
     basis_derivative_matrix(1, 1) =   (triangle_points[0].x() - triangle_points[2].x()) / (2 * tri_area);
 
-    // components of first basis function (a_3 - a_1)^ort / 2|e|
+    // components of first basis function (a_2 - a_3)^ort / 2|e|
     basis_derivative_matrix(2, 0) = - (triangle_points[1].y() - triangle_points[0].y()) / (2 * tri_area);
     basis_derivative_matrix(2, 1) =   (triangle_points[1].x() - triangle_points[0].x()) / (2 * tri_area);
 
@@ -190,7 +210,6 @@ template<
             for(index_type j = 0; j < m_dof; j++)
             {
                 value_type val = local_matr(i, j);
-                // we need '-1' for transition from triangle lib numeration to C++ arrays numeration
                 m_global_matrix(global_indeces[i], global_indeces[j]) += val;
             }
         }
@@ -214,7 +233,8 @@ template<
     {
         for(index_type i = 0; i < m_dof; i++)
         {
-            m_global_vector(global_indeces[i] - 1) += local_vec(i);
+            value_type val = local_vec(i);
+            m_global_vector(global_indeces[i]) += val;
         }
     }
     catch(const std::exception& e)

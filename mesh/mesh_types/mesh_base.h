@@ -142,6 +142,9 @@ public:
     triangles_list_type get_elements() { return m_elements; }
 
 public:
+    nodes_list_type get_mass_centers() { return m_mass_centers_elems; }
+
+public:
     index_type get_nodes_size() { return m_nodes.size(); }
 
 public:

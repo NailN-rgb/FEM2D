@@ -36,6 +36,9 @@ public:
     using index_type = IndexType;
     using value_type = ValueType;
 
+public: 
+    using vector_of_values = std::vector<value_type>;
+
 public:
     using point_2d = typename bg::geo<value_type>::point_2d;
 

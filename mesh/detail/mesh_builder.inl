@@ -91,6 +91,7 @@ template<
         PolyFile << ++current_segment_number << "\t"
                  << number_of_segments << "\t"
                  << 1 << "\t"
+                 << 1 << "\t"
                  << "\n";
 
         // write holes list
