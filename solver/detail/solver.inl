@@ -9,7 +9,7 @@ namespace solver
 template<
     typename IndexType,
     typename ValueType
-> static void solver_runner<IndexType, ValueType>::apply() noexcept(false)
+> void solver_runner<IndexType, ValueType>::apply()
 {
     try
     {

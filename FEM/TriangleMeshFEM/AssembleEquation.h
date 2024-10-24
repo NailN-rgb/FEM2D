@@ -71,13 +71,13 @@ private:
 
 // degree of freedom
 private:
-    index_type m_dof = 3;
+    std::size_t m_dof = 3;
 
 private:
-    index_type m_nodes_count;
+    std::size_t m_nodes_count;
 
 private:
-    index_type m_elems_count;
+    std::size_t m_elems_count;
 
 public:
     AssembleEquation() = default;
@@ -128,6 +128,12 @@ private:
 private:
     template<typename NodesList>
     void assemble_third_bc(NodesList nodes);
+
+private:
+    ValueType get_solution_error(
+        const vector_of_values &correct_solution,
+        const vector_of_values &calculated_solution
+    );
 
 };
 

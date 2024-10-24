@@ -145,13 +145,13 @@ public:
     nodes_list_type get_mass_centers() { return m_mass_centers_elems; }
 
 public:
-    index_type get_nodes_size() { return m_nodes.size(); }
+    std::size_t get_nodes_size() { return m_nodes.size(); }
 
 public:
-    index_type get_edges_size() { return m_edges.size(); }
+    std::size_t get_edges_size() { return m_edges.size(); }
 
 public:
-    index_type get_elements_size() { return m_elements.size(); }
+    std::size_t get_elements_size() { return m_elements.size(); }
 
 
 // HELPER FUNCTIONS
@@ -173,9 +173,9 @@ public:
     }
 
 public:
-    index_type get_dirichlet_bc_count()
+    std::size_t get_dirichlet_bc_count()
     {
-        index_type diriclet_nodes = 0;
+        std::size_t diriclet_nodes = 0;
 
         std::for_each(
             m_node_markers.begin(),

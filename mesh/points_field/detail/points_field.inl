@@ -1,7 +1,4 @@
-namespace FEM2D
-{
-
-namespace points_field
+namespace FEM2D::points_field
 {
 
 template<
@@ -40,22 +37,22 @@ template<
     point_2d left_low = convex_hull.min_corner();
     point_2d right_up = convex_hull.max_corner();
 
-    auto nx = static_cast<index_type>((right_up.x() - left_low.x()) / hx + 0.5) + 1;
-    auto ny = static_cast<index_type>((right_up.y() - left_low.y()) / hy + 0.5) + 1;
+    auto nx = static_cast<std::size_t>((right_up.x() - left_low.x()) / hx + 0.5) + 1;
+    auto ny = static_cast<std::size_t>((right_up.y() - left_low.y()) / hy + 0.5) + 1;
 
     vector_of_values x(nx - 1);
     vector_of_values y(ny - 1);
 
     x[0] = left_low.x() + hx / 2 ;
 
-    for(index_type i = 1; i < nx - 1; i++)
+    for(std::size_t i = 1; i < nx - 1; i++)
     {
         x[i] = x[i - 1] + hx;
     }
 
     y[0] = left_low.y() + hy / 2;
 
-    for(index_type i = 1; i < ny - 1; i++)
+    for(std::size_t i = 1; i < ny - 1; i++)
     {
         y[i] = y[i - 1] + hy;
     }
@@ -71,9 +68,9 @@ template<
     // remove points outside polygon
     
     // check point uniques
-    for(index_type i = 0; i < points.size(); i++)
+    for(std::size_t i = 0; i < points.size(); i++)
     {
-        for(index_type j = 0; j < points.size(); j++)
+        for(std::size_t j = 0; j < points.size(); j++)
         {
             if(i != j)
             {
@@ -112,9 +109,9 @@ template<
     );
 
     // points.insert(points.begin(), boundary.outer().begin(), boundary.outer().end());
-    for(size_t i = 0; i < x.size(); i++)
+    for(std::size_t i = 0; i < x.size(); i++)
     {
-        for(size_t j = 0; j < y.size(); j++)
+        for(std::size_t j = 0; j < y.size(); j++)
         {
             points.push_back(
                 { point_2d(x[i], y[j]), false }
@@ -124,7 +121,7 @@ template<
 
     // fill boundary marker vector
     // TODO: optimize this
-    for(index_type i = 0; i < points.size(); i++)
+    for(std::size_t i = 0; i < points.size(); i++)
     {
         if(i < boundary.outer().size())
         {
@@ -205,6 +202,4 @@ template<
     return true;
 }
 
-} //
-
-} //
+} // FEM::points_cloud

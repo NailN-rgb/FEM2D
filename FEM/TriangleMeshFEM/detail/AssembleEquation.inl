@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <FEM2D/FEM/TriangleMeshFEM/AssembleEquation.h> 
 
 namespace FEM2D
@@ -24,8 +23,6 @@ template<
     {
         // init arrays
         m_nodes_count = mesh_data->get_nodes_size();
-        index_type dirichlet_bc_count = mesh_data->get_dirichlet_bc_count();
-
         m_global_matrix.zeros(m_nodes_count, m_nodes_count);
         m_global_vector.zeros(m_nodes_count);
         m_solution.zeros(m_nodes_count);
@@ -34,27 +31,21 @@ template<
 
         this->assemble_boundary_conditions(mesh_data, ell_equation);
 
-        // TODO: #ifdef
+        #ifdef NDEBUG
         // m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
 
         // m_global_vector.save("FEM vector.txt", arma::raw_ascii);
-        
+        #endif
 
         // solve
         m_solution = arma::solve(m_global_matrix, m_global_vector);
 
         m_solution.save("Solution.txt", arma::raw_ascii);
 
-
-        vector_of_values expl_sol = ell_equation.solution;
-        vector_of_values calc_sol = arma::conv_to<std::vector<double>>::from(m_solution);
-
-        vector_of_values err;
-
-        for(int i = 0; i < expl_sol.size(); i++)
-        {
-            err.push_back(expl_sol[i] - calc_sol[i]);
-        }
+        std::cout <<
+            "Max error: " << 
+            get_solution_error(ell_equation.solution, arma::conv_to<std::vector<double>>::from(m_solution)) <<
+        std::endl;
 
         // print mesh & solution
         FEM2D::Plot::PlotMesh(mesh_data);
@@ -95,10 +86,10 @@ template<
         // 1. Set mass centers to equation
         //equation.calculate_at_points(mesh_data->m_mass_centers_elems);
 
-        index_type N_triangles = mesh_data->get_elements_size();
+        std::size_t N_triangles = mesh_data->get_elements_size();
 
         // TODO: parralelize this
-        for(index_type e = 0; e < N_triangles; e++)
+        for(std::size_t e = 0; e < N_triangles; e++)
         {
             std::vector<point_2d> triangle_points = mesh_data->get_points_by_triangle_id(e);
 
@@ -109,9 +100,9 @@ template<
             basis_grads = get_basis_gradients_on_element(mesh_data, triangle_points, triangle_area);
 
             // local matrix calculation loop
-            for(index_type i = 0; i < m_dof; i++)
+            for(std::size_t i = 0; i < m_dof; i++)
             {
-                for(index_type j = 0; j < m_dof; j++)
+                for(std::size_t j = 0; j < m_dof; j++)
                 {
                     local_matrix(i,j) = triangle_area * ( 
                                         equation.get_a11(e) * basis_grads(j , 0) * basis_grads(i, 0) + 
@@ -205,9 +196,9 @@ template<
 {
     try
     {
-        for(index_type i = 0; i < m_dof; i++)
+        for(std::size_t i = 0; i < m_dof; i++)
         {
-            for(index_type j = 0; j < m_dof; j++)
+            for(std::size_t j = 0; j < m_dof; j++)
             {
                 value_type val = local_matr(i, j);
                 m_global_matrix(global_indeces[i], global_indeces[j]) += val;
@@ -218,6 +209,8 @@ template<
     {
         throw std::runtime_error("assemble_matrix " + std::string(e.what()));
     }
+
+    return true;
 }
 
 
@@ -231,7 +224,7 @@ template<
 {
     try
     {
-        for(index_type i = 0; i < m_dof; i++)
+        for(std::size_t i = 0; i < m_dof; i++)
         {
             value_type val = local_vec(i);
             m_global_vector(global_indeces[i]) += val;
@@ -241,6 +234,42 @@ template<
     {
         throw std::runtime_error("assemble_vector " + std::string(e.what()));
     }
+
+    return true;
+}
+
+
+template<
+    typename IndexType,
+    typename ValueType
+> ValueType AssembleEquation<IndexType, ValueType>::get_solution_error(
+    const vector_of_values &correct_solution,
+    const vector_of_values &calculated_solution
+)
+{
+    if(correct_solution.size() != calculated_solution.size())
+    {
+        throw std::runtime_error("Solution vectors have not equal count of points");
+    }
+
+    vector_of_values errors_list(correct_solution.size());
+
+    // err[i] = corr[i] - calculated[i]
+    std::transform(
+            correct_solution.begin(),
+            correct_solution.end(),
+            calculated_solution.begin(),
+            errors_list.begin(),
+            std::minus<value_type>()
+    );
+
+    // sort calculated range
+    std::sort(
+        errors_list.begin(),
+        errors_list.end()
+    );
+
+    return errors_list.back();
 }
 
 } //

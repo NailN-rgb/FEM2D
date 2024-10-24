@@ -113,18 +113,16 @@ template<
 {
     try
     {
-        using point_type = typename bg::geo<double>::point_2d;
-
         // get mesh datas
         auto points = mesh->get_points();
         
-        Vector x;
-        Vector y;
+        std::vector<double> x;
+        std::vector<double> y;
 
         // get points arrays
         std::for_each(
-            points.begin(),
-            points.end(),
+            points.cbegin(),
+            points.cend(),
             [&x, &y](const auto& point)
             {
                 x.push_back(point.x());
@@ -153,12 +151,10 @@ template<
 > bool PlotSolution(
     Vector& solution,
     const MeshData& mesh
-)
+) 
 {
     try
     {
-        using point_type = typename bg::geo<double>::point_2d;
-
         // get mesh datas
         auto points = mesh->get_points();
         
@@ -167,8 +163,8 @@ template<
 
         // get points arrays
         std::for_each(
-            points.begin(),
-            points.end(),
+            points.cbegin(),
+            points.cend(),
             [&x, &y](const auto& point)
             {
                 x.push_back(point.x());

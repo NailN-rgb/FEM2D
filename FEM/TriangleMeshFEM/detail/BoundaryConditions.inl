@@ -72,7 +72,7 @@ void AssembleEquation<IndexType, ValueType>::assemble_first_bc(
         // TODO: make it vectorized
 
         // calculate true solution at Dirichlet Points
-        for(index_type i = 0; i < m_nodes_count; i++)
+        for(std::size_t i = 0; i < m_nodes_count; i++)
         {
             // if node have a Dirichlet bc marker 
             if(nodes.count(i) > 0)
@@ -89,7 +89,7 @@ void AssembleEquation<IndexType, ValueType>::assemble_first_bc(
         }
 
         // assemble to global matrix
-        for(index_type i = 0; i < m_nodes_count; i++)
+        for(std::size_t i = 0; i < m_nodes_count; i++)
         {
             // if node have a Dirichlet bc marker 
             if(nodes.count(i) > 0)
