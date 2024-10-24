@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <FEM2D/FEM/TriangleMeshFEM/AssembleEquation.h> 
 
 namespace FEM2D
@@ -24,8 +23,6 @@ template<
     {
         // init arrays
         m_nodes_count = mesh_data->get_nodes_size();
-        index_type dirichlet_bc_count = mesh_data->get_dirichlet_bc_count();
-
         m_global_matrix.zeros(m_nodes_count, m_nodes_count);
         m_global_vector.zeros(m_nodes_count);
         m_solution.zeros(m_nodes_count);
@@ -34,20 +31,27 @@ template<
 
         this->assemble_boundary_conditions(mesh_data, ell_equation);
 
+        #ifdef NDEBUG
+        // m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
+
+        // m_global_vector.save("FEM vector.txt", arma::raw_ascii);
+        #endif
+
         // solve
+        m_solution = arma::solve(m_global_matrix, m_global_vector);
 
-        // print solution
+        m_solution.save("Solution.txt", arma::raw_ascii);
 
+        std::cout <<
+            "Max error: " << 
+            get_solution_error(ell_equation.solution, arma::conv_to<std::vector<double>>::from(m_solution)) <<
+        std::endl;
+
+        // print mesh & solution
         FEM2D::Plot::PlotMesh(mesh_data);
+        FEM2D::Plot::PlotExplicitSolution(ell_equation.solution, mesh_data);
+        FEM2D::Plot::PlotSolution(m_solution, mesh_data);
         
-        // TODO: #ifdef
-        std::ofstream ofs_m("global_matrix.txt");
-        ofs_m << m_global_matrix;
-        ofs_m.close();
-
-        std::ofstream ofs_v("global_vector.txt");
-        ofs_v << m_global_vector;
-        ofs_v.close();
     }
     catch(const std::exception& e)
     {
@@ -80,12 +84,12 @@ template<
 
         // calculate equation Functions at triangle mass centres
         // 1. Set mass centers to equation
-        equation.calculate_at_points(mesh_data->m_mass_centers_elems);
+        //equation.calculate_at_points(mesh_data->m_mass_centers_elems);
 
-        index_type N_triangles = mesh_data->get_elements_size();
+        std::size_t N_triangles = mesh_data->get_elements_size();
 
         // TODO: parralelize this
-        for(index_type e = 0; e < N_triangles; e++)
+        for(std::size_t e = 0; e < N_triangles; e++)
         {
             std::vector<point_2d> triangle_points = mesh_data->get_points_by_triangle_id(e);
 
@@ -96,9 +100,9 @@ template<
             basis_grads = get_basis_gradients_on_element(mesh_data, triangle_points, triangle_area);
 
             // local matrix calculation loop
-            for(index_type i = 0; i < m_dof; i++)
+            for(std::size_t i = 0; i < m_dof; i++)
             {
-                for(index_type j = 0; j < m_dof; j++)
+                for(std::size_t j = 0; j < m_dof; j++)
                 {
                     local_matrix(i,j) = triangle_area * ( 
                                         equation.get_a11(e) * basis_grads(j , 0) * basis_grads(i, 0) + 
@@ -116,12 +120,31 @@ template<
             }
 
             // get local rhs value
-            local_rhs(0) = triangle_area * equation.get_f(e) / 3;
+            value_type right_side = triangle_area * equation.get_f(e) / 3;
+            local_rhs(0) = right_side;
+            local_rhs(1) = right_side;
+            local_rhs(2) = right_side;
 
             // assemble local matrixes into global
             
             this->assemble_matrix(local_matrix, mesh_data->get_node_id(e));
             this->assemble_vector(local_rhs, mesh_data->get_node_id(e));
+        }
+
+        m_global_matrix.save("Unassembled", arma::raw_ascii);
+        m_global_vector.save("Unassembled V", arma::raw_ascii);
+
+        if(!m_global_matrix.is_finite())
+        {
+            // TODO: assert?
+            m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
+            throw std::runtime_error("global matrix have a infinite elem");
+        }
+
+        if(m_global_matrix.has_nan())
+        {
+            m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
+            throw std::runtime_error("global matrix have a nan- elem");
         }
 
         return true;
@@ -148,14 +171,14 @@ template<
     matrix_type basis_derivative_matrix(3, 2);
 
     // components of first basis function (a_3 - a_1)^ort / 2|e|
-    basis_derivative_matrix(0, 0) = - (triangle_points[2].y() - triangle_points[0].y()) / (2 * tri_area);
-    basis_derivative_matrix(0, 1) =   (triangle_points[2].x() - triangle_points[0].x()) / (2 * tri_area);
+    basis_derivative_matrix(0, 0) = - (triangle_points[2].y() - triangle_points[1].y()) / (2 * tri_area);
+    basis_derivative_matrix(0, 1) =   (triangle_points[2].x() - triangle_points[1].x()) / (2 * tri_area);
     
-    // components of first basis function (a_3 - a_1)^ort / 2|e|
+    // components of first basis function (a_1 - a_2)^ort / 2|e|
     basis_derivative_matrix(1, 0) = - (triangle_points[0].y() - triangle_points[2].y()) / (2 * tri_area);
     basis_derivative_matrix(1, 1) =   (triangle_points[0].x() - triangle_points[2].x()) / (2 * tri_area);
 
-    // components of first basis function (a_3 - a_1)^ort / 2|e|
+    // components of first basis function (a_2 - a_3)^ort / 2|e|
     basis_derivative_matrix(2, 0) = - (triangle_points[1].y() - triangle_points[0].y()) / (2 * tri_area);
     basis_derivative_matrix(2, 1) =   (triangle_points[1].x() - triangle_points[0].x()) / (2 * tri_area);
 
@@ -173,13 +196,12 @@ template<
 {
     try
     {
-        for(index_type i = 0; i < m_dof; i++)
+        for(std::size_t i = 0; i < m_dof; i++)
         {
-            for(index_type j = 0; j < m_dof; j++)
+            for(std::size_t j = 0; j < m_dof; j++)
             {
                 value_type val = local_matr(i, j);
-                // we need '-1' for transition from triangle lib numeration to C++ arrays numeration
-                m_global_matrix(global_indeces[i] - 1, global_indeces[j] - 1) += val;
+                m_global_matrix(global_indeces[i], global_indeces[j]) += val;
             }
         }
     }
@@ -187,6 +209,8 @@ template<
     {
         throw std::runtime_error("assemble_matrix " + std::string(e.what()));
     }
+
+    return true;
 }
 
 
@@ -200,15 +224,52 @@ template<
 {
     try
     {
-        for(index_type i = 0; i < m_dof; i++)
+        for(std::size_t i = 0; i < m_dof; i++)
         {
-            m_global_vector(global_indeces[i] - 1) += local_vec(i);
+            value_type val = local_vec(i);
+            m_global_vector(global_indeces[i]) += val;
         }
     }
     catch(const std::exception& e)
     {
         throw std::runtime_error("assemble_vector " + std::string(e.what()));
     }
+
+    return true;
+}
+
+
+template<
+    typename IndexType,
+    typename ValueType
+> ValueType AssembleEquation<IndexType, ValueType>::get_solution_error(
+    const vector_of_values &correct_solution,
+    const vector_of_values &calculated_solution
+)
+{
+    if(correct_solution.size() != calculated_solution.size())
+    {
+        throw std::runtime_error("Solution vectors have not equal count of points");
+    }
+
+    vector_of_values errors_list(correct_solution.size());
+
+    // err[i] = corr[i] - calculated[i]
+    std::transform(
+            correct_solution.begin(),
+            correct_solution.end(),
+            calculated_solution.begin(),
+            errors_list.begin(),
+            std::minus<value_type>()
+    );
+
+    // sort calculated range
+    std::sort(
+        errors_list.begin(),
+        errors_list.end()
+    );
+
+    return errors_list.back();
 }
 
 } //

@@ -35,6 +35,8 @@ template<
     {
         throw std::runtime_error("MeshBase::parse:: " + std::string(e.what()));
     }
+
+    return true;
 }
 
 template<

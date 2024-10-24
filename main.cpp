@@ -3,7 +3,6 @@
 int main()
 {
     // start solver
-
     try
     {
         using index_type = int;

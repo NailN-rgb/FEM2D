@@ -16,7 +16,7 @@ public:
     using value_type = ValueType;
     
 public:
-    static void apply() noexcept(false);
+    static void apply();
 };
 
 } //

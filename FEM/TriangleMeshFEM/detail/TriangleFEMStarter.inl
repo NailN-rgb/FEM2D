@@ -49,7 +49,8 @@ template<
         // May be we need some entry equation data parce?
 
         // set points and calculate entered functions at points
-        m_elliptic_equation.calculate_at_points(mesh_data->get_points());
+        m_elliptic_equation.calculate_at_points(mesh_data->get_mass_centers());
+        m_elliptic_equation.solution_at_point(mesh_data->get_points());
     }
     catch(const std::exception& e)
     {

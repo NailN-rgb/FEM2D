@@ -70,9 +70,26 @@ void AssembleEquation<IndexType, ValueType>::assemble_first_bc(
     try
     {
         // TODO: make it vectorized
-        // TODO: correct rhs
 
-        for(index_type i = 0; i < m_nodes_count; i++)
+        // calculate true solution at Dirichlet Points
+        for(std::size_t i = 0; i < m_nodes_count; i++)
+        {
+            // if node have a Dirichlet bc marker 
+            if(nodes.count(i) > 0)
+            {
+                value_type expl_solution = ell_equation.get_sol(i); 
+                m_solution(i) = expl_solution;
+            }
+        }
+
+        // change rhs vector elements
+        for(std::size_t i = 0; i < m_nodes_count; i++)
+        {
+            m_global_vector(i) -= arma::dot(m_global_matrix.row(i), m_solution);
+        }
+
+        // assemble to global matrix
+        for(std::size_t i = 0; i < m_nodes_count; i++)
         {
             // if node have a Dirichlet bc marker 
             if(nodes.count(i) > 0)
@@ -80,12 +97,11 @@ void AssembleEquation<IndexType, ValueType>::assemble_first_bc(
                 arma::rowvec row(m_nodes_count);
 
                 vector_type col(m_nodes_count);
-                col(i) = 1;
+                // TODO: rewrite this
+                col(i) = m_solution(i) > 0.00001 ? m_global_vector(i) / m_solution(i) : 1e9;
 
                 m_global_matrix.row(i) = row;
                 m_global_matrix.col(i) = col;
-
-                m_global_vector(i) = ell_equation.get_sol(i);
             }
         }
 

@@ -24,10 +24,15 @@ namespace geometry
 
         struct equal_points
         {
-		bool operator()(const point_2d& p1, const point_2d& p2) const
-		{
-			return ((fabs(p1.x() - p2.x()) < 1.e-6) && (fabs(p1.y() - p2.y()) < 1.e-6));
-		};
+            bool operator()(const point_2d& p1, const point_2d& p2) const
+            {
+                return ((fabs(p1.x() - p2.x()) < 1.e-6) && (fabs(p1.y() - p2.y()) < 1.e-6));
+            }
+
+            bool is_equal(const point_2d& p1, const point_2d& p2) const
+            {
+                return ((fabs(p1.x() - p2.x()) < 1.e-6) && (fabs(p1.y() - p2.y()) < 1.e-6));
+            }
         };
     };
 
