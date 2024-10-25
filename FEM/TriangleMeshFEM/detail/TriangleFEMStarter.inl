@@ -13,10 +13,7 @@ namespace solvers
 namespace TriFem
 {
 
-template<
-    typename IndexType,
-    typename ValueType
-> void TriangleFEMStarter<IndexType, ValueType>::solve(
+template<typename BaseSolver> bool TriangleFEMStarter<BaseSolver>::solve(
     int solving_algorithm,
     const mesh_type_pointer &mesh_data
 )
@@ -32,37 +29,13 @@ template<
     {
         throw std::runtime_error("TriangleFemStarter::solve " + std::string(e.what()));
     }
+
+    return true;
     
 }
 
 
-template<
-    typename IndexType,
-    typename ValueType
-> void TriangleFEMStarter<IndexType, ValueType>::set_elliptic_equation(
-    const mesh_type_pointer &mesh_data
-)
-{
-    try
-    {
-        // initialize equation params
-        // May be we need some entry equation data parce?
-
-        // set points and calculate entered functions at points
-        m_elliptic_equation.calculate_at_points(mesh_data->get_mass_centers());
-        m_elliptic_equation.solution_at_point(mesh_data->get_points());
-    }
-    catch(const std::exception& e)
-    {
-        throw std::runtime_error("set_elliptic_equation:: " + std::string(e.what()));
-    }
-}
-
-
-template<
-    typename IndexType,
-    typename ValueType
-> void TriangleFEMStarter<IndexType, ValueType>::get_fem_system(
+template<typename BaseSolver> void TriangleFEMStarter<BaseSolver>::get_fem_system(
     const mesh_type_pointer &mesh_data
 )
 {
@@ -70,7 +43,7 @@ template<
     {
         m_assembler.assemble_equation(
             mesh_data,
-            m_elliptic_equation
+            this->m_elliptic_equation
         );
     }
     catch(const std::exception& e)

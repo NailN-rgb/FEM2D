@@ -15,7 +15,5 @@ int main()
         throw std::runtime_error("main::" + std::string(e.what()));
     }
     
-    std::cout << "Solver Finished" << std::endl;
-
     return 0;
 }

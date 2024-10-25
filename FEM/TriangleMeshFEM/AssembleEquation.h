@@ -8,8 +8,6 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/operation.hpp>
 
-#include <FEM2D/mesh/mesh_types/mesh_base.h> // include trimesh
-
 #include <FEM2D/mesh/boost_datatypes/types.h>
 
 // for visualization

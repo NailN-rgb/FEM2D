@@ -1,12 +1,7 @@
 #pragma once
-// class to call other FEM2D classes
 
 #include <FEM2D/precompiled.h>
-#include <FEM2D/equationInit/EllipticEquation.h>
-
 #include <FEM2D/FEM/TriangleMeshFEM/AssembleEquation.h>
-
-#include <FEM2D/mesh/mesh_types/mesh_base.h>
 
 namespace FEM2D
 {
@@ -18,33 +13,23 @@ namespace TriFem
 {
 
 template<
-    typename IndexType,
-    typename ValueType
+    typename BaseSolver
 >
-class TriangleFEMStarter
-{
-public:
-    using index_type = IndexType;
-    using value_type = ValueType;
-
-public:
-    using ell_equation_type = FEM2D::equation::EllepticEquation<index_type, value_type>;
-
-public:
-    using equation_assembler_type = FEM2D::solvers::TriFem::AssembleEquation<index_type, value_type>;
-
-public:
-    using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
-    using mesh_type_pointer = std::unique_ptr<mesh_type>;
+class TriangleFEMStarter : public BaseSolver {
+// TriFem assembler type
+private:
+    using index_type = typename BaseSolver::index_type;
+    using value_type = typename BaseSolver::value_type;
+    using mesh_type_pointer = typename BaseSolver::mesh_type_pointer;
 
 private:
-    ell_equation_type m_elliptic_equation;
+    using equation_assembler_type = FEM2D::solvers::TriFem::AssembleEquation<index_type, value_type>;
 
+// init equation
 private:
     equation_assembler_type m_assembler; 
 
-    // constructor
-
+// default ctor's
 public:
     TriangleFEMStarter() = default;
     TriangleFEMStarter(const TriangleFEMStarter& trifem) = default;
@@ -52,27 +37,16 @@ public:
 
 // main solving function
 public:
-    void solve(
+    bool solve(
         int solving_algorithm,
         const mesh_type_pointer &mesh_data
-    );
-
-// call & complete equation initializer
-public:
-    void set_elliptic_equation(
-        const mesh_type_pointer &mesh_data
-    );
+    ) override;
     
 // call & complete matrix/RHS builder 
-public:
+private:
     void get_fem_system(
         const mesh_type_pointer &mesh_data
     ); 
-
-// call Equation System solver
-public:
-    void solve();
-
 };
 
 } //
