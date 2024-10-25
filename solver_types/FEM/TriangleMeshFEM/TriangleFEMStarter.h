@@ -1,21 +1,16 @@
 #pragma once
 
 #include <FEM2D/precompiled.h>
-#include <FEM2D/FEM/TriangleMeshFEM/AssembleEquation.h>
+#include <FEM2D/solver_types/FEM/TriangleMeshFEM/AssembleEquation.h>
 
-namespace FEM2D
-{
-
-namespace solvers
-{
-
-namespace TriFem
+namespace FEM2D::solvers::TriFem
 {
 
 template<
     typename BaseSolver
 >
-class TriangleFEMStarter : public BaseSolver {
+class TriangleFEMStarter : public BaseSolver 
+{
 // TriFem assembler type
 private:
     using index_type = typename BaseSolver::index_type;
@@ -50,7 +45,5 @@ private:
 };
 
 } //
-} //
-} //
 
-#include <FEM2D/FEM/TriangleMeshFEM/detail/TriangleFEMStarter.inl>
+#include <FEM2D/solver_types/FEM/TriangleMeshFEM/detail/TriangleFEMStarter.inl>

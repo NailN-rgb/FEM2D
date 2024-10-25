@@ -3,7 +3,7 @@
 #include <FEM2D/mesh/mesh_builder.h>
 #include <FEM2D/mesh/mesh_types/mesh_base.h>
 #include <FEM2D/solver_types/base_solver.h>
-#include <FEM2D/FEM/TriangleMeshFEM/TriangleFEMStarter.h>
+#include <FEM2D/solver_types/FEM/TriangleMeshFEM/TriangleFEMStarter.h>
 #include <FEM2D/SolversFactory/SolversFactory.h>
 
 
@@ -21,11 +21,12 @@ template<
     {
         using mesh_builder_type = FEM2D::mesh::Mesh_builder<index_type, value_type>;
         using base_solver_type = FEM2D::solvers::BaseSolver::BaseSolverStarter<index_type, value_type>;
-        using FEM_solver_type  = FEM2D::solvers::TriFem::TriangleFEMStarter<base_solver_type>;
 
+        // create mesh
         mesh_builder_type mesh;
         auto mesh_ptr = mesh.build_mesh(true);
 
+        // get pointer-to-solver 
         auto solver = FEM2D::Factories::SolverFactory<index_type, value_type>::create_solver("FEM");
 
         if(solver->solve(1, mesh_ptr))

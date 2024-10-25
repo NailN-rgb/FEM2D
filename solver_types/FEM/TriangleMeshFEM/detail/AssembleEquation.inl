@@ -1,6 +1,6 @@
 #pragma once
 
-#include <FEM2D/FEM/TriangleMeshFEM/AssembleEquation.h> 
+#include <FEM2D/solver_types/FEM/TriangleMeshFEM/AssembleEquation.h> 
 
 namespace FEM2D
 {

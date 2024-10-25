@@ -14,12 +14,7 @@
 #include <FEM2D/plot/plot_graphs.h>
 
 // class for assemble FEM system by given mesh
-namespace FEM2D
-{
-namespace solvers
-{
-
-namespace TriFem
+namespace FEM2D::solvers::TriFem
 {
 
 namespace bg = boost::geometry;
@@ -136,8 +131,6 @@ private:
 };
 
 } //
-} //
-} //
 
-#include <FEM2D/FEM/TriangleMeshFEM/detail/AssembleEquation.inl>
-#include <FEM2D/FEM/TriangleMeshFEM/detail/BoundaryConditions.inl>
+#include <FEM2D/solver_types/FEM/TriangleMeshFEM/detail/AssembleEquation.inl>
+#include <FEM2D/solver_types/FEM/TriangleMeshFEM/detail/BoundaryConditions.inl>

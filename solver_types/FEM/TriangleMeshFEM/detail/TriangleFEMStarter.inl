@@ -2,7 +2,7 @@
 
 #include <FEM2D/precompiled.h>
 
-#include <FEM2D/FEM/TriangleMeshFEM/TriangleFEMStarter.h>
+#include <FEM2D/solver_types/FEM/TriangleMeshFEM/TriangleFEMStarter.h>
 
 namespace FEM2D
 {
