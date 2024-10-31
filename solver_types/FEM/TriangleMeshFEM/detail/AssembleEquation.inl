@@ -191,7 +191,7 @@ template<
     typename ValueType
 > bool AssembleEquation<IndexType, ValueType>::assemble_matrix(
     const matrix_type &local_matr, 
-    const std::vector<index_type> &global_indeces
+    const std::vector<std::size_t> &global_indeces
 )
 {
     try
@@ -219,7 +219,7 @@ template<
     typename ValueType
 > bool AssembleEquation<IndexType, ValueType>::assemble_vector(
     const vector_type &local_vec, 
-    const std::vector<index_type> &global_indeces
+    const std::vector<std::size_t> &global_indeces
 )
 {
     try

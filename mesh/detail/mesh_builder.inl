@@ -196,9 +196,9 @@ template<
         // take this data from m_mesh_base
         std::vector<point_2d> mesh_points = m_triangle_mesh->get_points_list(m_triangle_mesh->in_);
 
-        std::vector<std::vector<index_type>> mesh_segments = m_triangle_mesh->get_segments_list(m_triangle_mesh->in_);
+        std::vector<std::vector<std::size_t>> mesh_segments = m_triangle_mesh->get_segments_list(m_triangle_mesh->in_);
 
-        std::vector<std::vector<index_type>> mesh_triangles = m_triangle_mesh->get_triangle_list(m_triangle_mesh->in_); 
+        std::vector<std::vector<std::size_t>> mesh_triangles = m_triangle_mesh->get_triangle_list(m_triangle_mesh->in_); 
 
 
         std::ofstream file;

@@ -133,9 +133,9 @@ public:
 
 
 public:
-	std::vector<int> get_boundary_attributes(const triangulateio &io)
+	std::vector<std::size_t> get_boundary_attributes(const triangulateio &io)
 	{
-		std::vector<int> result;
+		std::vector<std::size_t> result;
 
 		for(auto pt_m = io.pointmarkerlist; pt_m != io.pointmarkerlist + io.numberofpoints; pt_m++)
 		{
@@ -146,13 +146,13 @@ public:
 	}
 
 public:
-	std::vector<std::vector<int>> get_segments_list(const triangulateio &io)
+	std::vector<std::vector<std::size_t>> get_segments_list(const triangulateio &io)
 	{
-		std::vector<std::vector<int>> segments_list;
+		std::vector<std::vector<std::size_t>> segments_list;
 
 		for(auto pt = io.edgelist; pt != io.edgelist + 2 * io.numberofedges; pt+=2)
 		{
-			std::vector<int> segment;
+			std::vector<std::size_t> segment;
 			segment.push_back(*pt - 1);
 			segment.push_back(*(pt + 1) - 1);
 
@@ -163,13 +163,13 @@ public:
 	}
 
 public:
-	std::vector<std::vector<int>> get_triangle_list(const triangulateio &io)
+	std::vector<std::vector<std::size_t>> get_triangle_list(const triangulateio &io)
 	{
-		std::vector<std::vector<int>> tri_list;
+		std::vector<std::vector<std::size_t>> tri_list;
 
 		for(auto pt = io.trianglelist; pt < io.trianglelist + io.numberofcorners * io.numberoftriangles; pt+=3)
 		{
-			std::vector<int> tri;
+			std::vector<std::size_t> tri;
 			tri.push_back(*pt - 1);
 			tri.push_back(*(pt + 1) - 1);
 			tri.push_back(*(pt + 2) - 1);

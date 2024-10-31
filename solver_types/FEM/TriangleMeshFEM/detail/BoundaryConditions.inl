@@ -21,17 +21,17 @@ bool AssembleEquation<IndexType, ValueType>::assemble_boundary_conditions(
 )
 {
     // TODO: relalize robin's bc assembling
-    std::vector<index_type> boundary_markers = trimesh->get_bc_markers();
+    std::vector<std::size_t> boundary_markers = trimesh->get_bc_markers();
 
     // 1 - Dirichle't boundary cond, 3 - Robin's boundary cond
 
-    std::unordered_set<index_type> first_bc_points;
+    std::unordered_set<std::size_t> first_bc_points;
 
-    index_type node_idx = 0;
+    std::size_t node_idx = 0;
     std::for_each(
         boundary_markers.begin(),
         boundary_markers.end(),
-        [&](index_type point_marker)
+        [&](std::size_t point_marker)
         {
             if(point_marker == 1)
             {

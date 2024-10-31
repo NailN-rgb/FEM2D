@@ -20,7 +20,6 @@ template<
     try
     {
         using mesh_builder_type = FEM2D::mesh::Mesh_builder<index_type, value_type>;
-        using base_solver_type = FEM2D::solvers::BaseSolver::BaseSolverStarter<index_type, value_type>;
 
         // create mesh
         mesh_builder_type mesh;

@@ -20,87 +20,60 @@ template<
 >
 class MeshBase
 {
-public:
+private:
     using index_type = IndexType;
     using value_type = ValueType;
 
-public:
     using point_2d     = typename bg::geo<value_type>::point_2d;
 	using segment_type = typename bg::geo<value_type>::segment_2d;
 	using polygon_2d   = typename bg::geo<value_type>::polygon_2d;
     using box_2d       = typename bg::geo<value_type>::box_2d;
     using line_2d      = typename bg::geo<value_type>::line_2d;
 
-public:
+
     using triangle_mesh_t   = FEM2D::mesh::trianglemesh::TriangleMesh;
     using triangle_mesh_pointer = std::unique_ptr<triangle_mesh_t>; 
 
 // 1. List of nodes
-public:
     using nodes_list_type = std::vector<point_2d>;
 
 // 2. Edges List
-public:
-    using edges_list_type = std::vector<std::vector<index_type>>;
+    using edges_list_type = std::vector<std::vector<std::size_t>>;
 
 // 3. Triangles List
-public:
-    using triangles_list_type = std::vector<std::vector<index_type>>;
+    using triangles_list_type = std::vector<std::vector<std::size_t>>;
 
 // 4. Boundary edges List
-public:
-    using boundary_edges_list_type = std::vector<std::pair<index_type, bool>>;
+    using boundary_edges_list_type = std::vector<std::pair<std::size_t, bool>>;
 
 // 5. Length of edges
-public:
     using edges_length_list_type = std::vector<value_type>;
 
 // 6. Triangle Areas
-public:
     using triangle_areas_list_type = std::vector<value_type>;
 
 // 7. Triangles Center List
-public:
     using triangle_center_list_type = std::vector<point_2d>;
 
 // 8. Edges Center List
     using edges_center_list_type = std::vector<point_2d>;
 
-public:
 // 9. Elements mass centers List
     using elems_mass_centers_list = std::vector<point_2d>;
 
 // 10. Node boundary condition type
-    using nodes_bc_list_type = std::vector<index_type>;
+    using nodes_bc_list_type = std::vector<std::size_t>;
 
 public:
     nodes_list_type m_nodes;
-
-public:
     nodes_bc_list_type m_node_markers;
-
-public:
     edges_list_type m_edges;
-
-public:
     triangles_list_type m_elements;
-
-public:
     boundary_edges_list_type m_b_edges;
-
-public:
     edges_length_list_type m_length_edges;
-
-public:
     triangle_areas_list_type m_areas_triangle;
-
-public:
     triangle_center_list_type m_centers_triangle;
-
-public:
     edges_center_list_type m_centers_edges;
-
-public:
     elems_mass_centers_list m_mass_centers_elems;
 
 
@@ -112,7 +85,7 @@ public:
 
 // set nodes, edges, triangles 
 public:
-    bool parse(const triangle_mesh_pointer &trimesh);
+    bool parse(const triangle_mesh_pointer &triangle_mesh);
 
 // get additional mesh data
 public:
@@ -131,49 +104,28 @@ public:
 // class getters
 public:
     nodes_list_type get_points() { return m_nodes; }
-
-public:
     nodes_bc_list_type get_bc_markers() { return m_node_markers; }
-
-public:
     edges_list_type get_edges() { return m_edges; }
-
-public:
     triangles_list_type get_elements() { return m_elements; }
-
-public:
     nodes_list_type get_mass_centers() { return m_mass_centers_elems; }
-
-public:
     std::size_t get_nodes_size() { return m_nodes.size(); }
-
-public:
     std::size_t get_edges_size() { return m_edges.size(); }
-
-public:
     std::size_t get_elements_size() { return m_elements.size(); }
 
 
 // HELPER FUNCTIONS
-
 // get_points
 public:
-    point_2d get_point_by_id(std::size_t node_index)
-    {
-        return m_nodes[node_index];
-    }
+    point_2d get_point_by_id(std::size_t node_index) { return m_nodes[node_index];}
 
 public:
-    point_2d get_mass_center(std::size_t triangle_id)
-    {
-        return m_mass_centers_elems[triangle_id];
-    }
+    point_2d get_mass_center(std::size_t triangle_id) { return m_mass_centers_elems[triangle_id];}
 
+public:
 // return points of triangle
-public:
-    nodes_list_type get_points_by_triangle_id(index_type idx)
+    nodes_list_type get_points_by_triangle_id(std::size_t idx)
     {
-        std::vector<index_type> triangle_points_indexes = get_node_id(idx);
+        std::vector<std::size_t> triangle_points_indexes = get_node_id(idx);
 
         return std::vector{
             m_nodes[triangle_points_indexes[0]],
@@ -182,9 +134,9 @@ public:
         };
     };
 
-// return global id of node with local index local_num_position at triangle_id
 public:
-    std::vector<index_type> get_node_id(index_type triangle_id)
+// return global id of node with local index local_num_position at triangle_id
+    std::vector<std::size_t> get_node_id(std::size_t triangle_id)
     {
         return m_elements[triangle_id];
     }

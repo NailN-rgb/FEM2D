@@ -100,10 +100,10 @@ private:
         );
     
 private:
-    bool assemble_matrix(const matrix_type& local_matrix, const std::vector<index_type> &global_indeces);
+    bool assemble_matrix(const matrix_type& local_matrix, const std::vector<std::size_t> &global_indeces);
 
 private:
-    bool assemble_vector(const vector_type& local_vector, const std::vector<index_type> &global_indeces);
+    bool assemble_vector(const vector_type& local_vector, const std::vector<std::size_t> &global_indeces);
 
 private:
     bool assemble_boundary_conditions(

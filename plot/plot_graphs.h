@@ -46,7 +46,7 @@ bool PlotMesh(
     try
     {
         using point_type = typename bg::geo<double>::point_2d;
-        using index_type = int;
+        using index_type = std::size_t;
 
         // get mesh datas
         std::vector<point_type> points = mesh->get_points();

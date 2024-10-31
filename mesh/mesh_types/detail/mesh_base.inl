@@ -15,21 +15,21 @@ namespace mesh_types
 template<
     typename IndexType,
     typename ValueType
-> bool MeshBase<IndexType, ValueType>::parse(const triangle_mesh_pointer &trimesh)
+> bool MeshBase<IndexType, ValueType>::parse(const triangle_mesh_pointer &triangle_mesh)
 {
     try
     {
         // get nodes
-        m_nodes = trimesh->get_points_list(trimesh->in_);
+        m_nodes = triangle_mesh->get_points_list(triangle_mesh->in_);
 
         //get boundary nodes attributes
-        m_node_markers = trimesh->get_boundary_attributes(trimesh->in_);
+        m_node_markers = triangle_mesh->get_boundary_attributes(triangle_mesh->in_);
 
         // get edges
-        m_edges = trimesh->get_segments_list(trimesh->in_);
+        m_edges = triangle_mesh->get_segments_list(triangle_mesh->in_);
 
         // get triangles
-        m_elements = trimesh->get_triangle_list(trimesh->in_);
+        m_elements = triangle_mesh->get_triangle_list(triangle_mesh->in_);
     }
     catch(const std::exception& e)
     {
@@ -73,7 +73,7 @@ template<
     std::for_each(
         m_edges.begin(),
         m_edges.end(),
-        [this](std::vector<index_type> edge)
+        [this](std::vector<std::size_t> edge)
         {
             m_length_edges.push_back(
                 get_line_length(m_nodes[edge[0]], m_nodes[edge[1]])
@@ -92,7 +92,7 @@ template<
     std::for_each(
         m_elements.begin(),
         m_elements.end(),
-        [this](std::vector<index_type> triangle)
+        [this](std::vector<std::size_t> triangle)
         {
             m_areas_triangle.push_back(
                 0.5 * std::fabs(
@@ -123,7 +123,7 @@ template<
     std::for_each(
         m_edges.begin(),
         m_edges.end(),
-        [this](std::vector<index_type> edge)
+        [this](std::vector<std::size_t> edge)
         {
             m_centers_edges.push_back(
                 point_2d(
@@ -144,7 +144,7 @@ template<
     std::for_each(
         m_elements.begin(),
         m_elements.end(),
-        [this](std::vector<index_type> triangle)
+        [this](std::vector<std::size_t> triangle)
         {
             m_mass_centers_elems.push_back(
                 point_2d(
@@ -155,24 +155,6 @@ template<
         }
     );
 }
-
-
-template<
-    typename IndexType,
-    typename ValueType
-> 
-typename MeshBase<IndexType, ValueType>::nodes_list_type 
-MeshBase<IndexType, ValueType>::get_points_by_triangle_id(index_type idx)
-{
-    nodes_list_type result;
-    for(index_type i = 0; i < 3; i++)
-    {
-        result.push_back(m_nodes[m_elements[idx][i]]);
-    }
-
-    return result;
-}
-
 
 } //
 } //
