@@ -24,8 +24,6 @@ class EllepticEquation
 public:
     using index_type = IndexType;
     using value_type = ValueType;
-
-public:
     using point_2d = typename bg::geo<value_type>::point_2d;
 
 // A - matrix function values
@@ -68,17 +66,14 @@ public:
 
 // constructor
 public:
-    EllepticEquation(const std::vector<point_2d> &points) : m_points(points)
+    explicit EllepticEquation(const std::vector<point_2d> &points) : m_points(points)
     {
         this->resize_arrays(points.size());
     }
 
 // set points
 public:
-    void set_points(const std::vector<point_2d> &points)
-    {
-        m_points = points;
-    }
+    void set_points(const std::vector<point_2d> &points) { m_points = points;}
 
 // set points and calculate
 public:
@@ -86,11 +81,11 @@ public:
     {
         try
         {
-            this->clear_data();
+            clear_data();
 
-            this->set_points(points);
-            this->resize_arrays(points.size());
-            this->fill_datas();
+            set_points(points);
+            resize_arrays(points.size());
+            fill_datas();
         }
         catch(const std::exception& e)
         {
@@ -141,6 +136,7 @@ private:
         }
     } 
 
+
 private:
     void clear_data()
     {
@@ -166,24 +162,24 @@ private:
 // default values for functions
 // -div(A grad u + bu) + [c1,c2].grad u + au = f
 public:
-    value_type f_a11(value_type x, value_type y) { return 1.; }
-    value_type f_a12(value_type x, value_type y) { return 0.; }
-    value_type f_a21(value_type x, value_type y) { return 0.; }
-    value_type f_a22(value_type x, value_type y) { return 1.; }
+    value_type f_a11(value_type x, value_type y) const { return 1.; }
+    value_type f_a12(value_type x, value_type y) const { return 0.; }
+    value_type f_a21(value_type x, value_type y) const { return 0.; }
+    value_type f_a22(value_type x, value_type y) const { return 1.; }
 
 public:
-    value_type f_b1(value_type x, value_type y) {return 0; }
-    value_type f_b2(value_type x, value_type y) {return 0; }
+    value_type f_b1(value_type x, value_type y) const {return 0; }
+    value_type f_b2(value_type x, value_type y) const {return 0; }
 
 public:
-    value_type f_c1(value_type x, value_type y) {return 1; }
-    value_type f_c2(value_type x, value_type y) {return 1; }
+    value_type f_c1(value_type x, value_type y) const{return 1; }
+    value_type f_c2(value_type x, value_type y) const{return 1; }
 
 public:
-    value_type f_a(value_type x, value_type y) {return (2.0 + std::sin((x + y))); }
+    value_type f_a(value_type x, value_type y) const {return (2.0 + std::sin((x + y))); }
 
 public:
-    value_type f_f(value_type x, value_type y) 
+    value_type f_f(value_type x, value_type y) const
     {
         return - 4 * std::cos(2 * (x + y)) +
             f_c1(x, y) * sol_d1(x, y) +
@@ -237,71 +233,22 @@ public:
 
 // block of functions that provides acsess to calculated values
 public:
-    value_type get_a11(index_type i) const
-    {
-        return a11[i];
-    } 
-    
-public:
-    value_type get_a12(index_type i) const
-    {
-        return a12[i];
-    } 
+    value_type get_a11(index_type i) const { return a11[i];}     
+    value_type get_a12(index_type i) const { return a12[i];} 
+    value_type get_a21(index_type i) const { return a21[i];} 
+    value_type get_a22(index_type i) const { return a22[i];} 
 
-public:
-    value_type get_a21(index_type i) const
-    {
-        return a21[i];
-    } 
+    value_type get_b1(index_type i) const { return b1[i];} 
+    value_type get_b2(index_type i) const { return b2[i];} 
 
-public:
-    value_type get_a22(index_type i) const
-    {
-        return a22[i];
-    } 
+    value_type get_c1(index_type i) const { return c1[i];} 
+    value_type get_c2(index_type i) const { return c2[i];} 
 
-public:
-    value_type get_b1(index_type i) const
-    {
-        return b1[i];
-    } 
+    value_type get_a(index_type i) const { return a[i];} 
 
-public:
-    value_type get_b2(index_type i) const
-    {
-        return b2[i];
-    } 
+    value_type get_f(index_type i) const { return f[i];} 
 
-public:
-    value_type get_c1(index_type i) const
-    {
-        return c1[i];
-    } 
-
-public:
-    value_type get_c2(index_type i) const
-    {
-        return c2[i];
-    } 
-
-public:
-    value_type get_a(index_type i) const
-    {
-        return a[i];
-    } 
-
-public:
-    value_type get_f(index_type i) const
-    {
-        return f[i];
-    } 
-
-public:
-    value_type get_sol(index_type i) const
-    {
-        return solution[i];
-    }
-
+    value_type get_sol(index_type i) const { return solution[i];}
 };
 
 } //

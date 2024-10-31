@@ -26,7 +26,7 @@ private:
 // default ctor's
 public:
     TriangleHDGStarter() = default;
-    TriangleHDGStarter(const TriangleHDGStarter& trihdg) = default;
+    TriangleHDGStarter(const TriangleHDGStarter& triangle_hdg) = default;
     ~TriangleHDGStarter() = default;
 
 // main solving function

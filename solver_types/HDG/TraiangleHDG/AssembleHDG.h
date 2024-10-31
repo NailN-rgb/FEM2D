@@ -28,10 +28,9 @@ class AssembleHDG
 // HDG Method Assembler Class
     using index_type = IndexType;
     using value_type = ValueType;
- 
-    using vector_of_values = std::vector<value_type>;
-
     using point_2d = typename bg::geo<value_type>::point_2d;
+
+    using vector_of_values = std::vector<value_type>;
 
 // mesh type
     using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
@@ -84,7 +83,28 @@ private:
         const mesh_type_pointer & mesh_data,
         const ell_equation_type &equation
         matrix_type &local_matrix,
+        const matrix_type& discrette_derivative,
         const std::size_t element_index
+    ) const;
+
+private:
+    bool calculate_F_local(
+        const mesh_type_pointer & mesh_data,
+        const ell_equation_type &equation
+        vector_type &local_vector,
+        const std::size_t element_index
+    ) const;
+
+private:
+    bool assemble_matrix(
+        const matrix_type& local_matrix,
+        std::size_t element_index
+    );
+
+private:
+    bool assemble_vector(
+        const vector_type& local_vector,
+        std::size_t element_index
     );
 
 private:
@@ -92,8 +112,7 @@ private:
         matrix_type& phi,
         const point_2d& edge_center,
         const point_2d& triangle_mass_center
-    );
-
+    ) const;
 
 };
 

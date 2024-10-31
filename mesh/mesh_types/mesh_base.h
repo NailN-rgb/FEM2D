@@ -1,14 +1,7 @@
 #pragma once
 
 #include <FEM2D/precompiled.h>
-
-namespace FEM2D
-{
-
-namespace mesh
-{
-    
-namespace mesh_types
+namespace FEM2D::mesh::mesh_types
 {
 
 namespace bg = boost::geometry;
@@ -30,37 +23,27 @@ private:
     using box_2d       = typename bg::geo<value_type>::box_2d;
     using line_2d      = typename bg::geo<value_type>::line_2d;
 
-
-    using triangle_mesh_t   = FEM2D::mesh::trianglemesh::TriangleMesh;
+    using triangle_mesh_t       = FEM2D::mesh::trianglemesh::TriangleMesh;
     using triangle_mesh_pointer = std::unique_ptr<triangle_mesh_t>; 
 
 // 1. List of nodes
     using nodes_list_type = std::vector<point_2d>;
-
 // 2. Edges List
     using edges_list_type = std::vector<std::vector<std::size_t>>;
-
 // 3. Triangles List
     using triangles_list_type = std::vector<std::vector<std::size_t>>;
-
 // 4. Boundary edges List
     using boundary_edges_list_type = std::vector<std::pair<std::size_t, bool>>;
-
 // 5. Length of edges
     using edges_length_list_type = std::vector<value_type>;
-
 // 6. Triangle Areas
     using triangle_areas_list_type = std::vector<value_type>;
-
 // 7. Triangles Center List
     using triangle_center_list_type = std::vector<point_2d>;
-
 // 8. Edges Center List
     using edges_center_list_type = std::vector<point_2d>;
-
 // 9. Elements mass centers List
     using elems_mass_centers_list = std::vector<point_2d>;
-
 // 10. Node boundary condition type
     using nodes_bc_list_type = std::vector<std::size_t>;
 
@@ -93,37 +76,38 @@ public:
 
 // additional data calculators preudonames
 public:
-    void get_boundary_edges();
     void get_edges_length();
     void get_triangle_areas();
-    void get_triangle_centers();
     void get_edges_centers();
     void get_triangles_mass_centers();
 
 
 // class getters
 public:
-    nodes_list_type get_points() { return m_nodes; }
-    nodes_bc_list_type get_bc_markers() { return m_node_markers; }
-    edges_list_type get_edges() { return m_edges; }
-    triangles_list_type get_elements() { return m_elements; }
-    nodes_list_type get_mass_centers() { return m_mass_centers_elems; }
-    std::size_t get_nodes_size() { return m_nodes.size(); }
-    std::size_t get_edges_size() { return m_edges.size(); }
-    std::size_t get_elements_size() { return m_elements.size(); }
+    nodes_list_type get_points() const { return m_nodes; }
+    nodes_bc_list_type get_bc_markers() const { return m_node_markers; }
+    edges_list_type get_edges() const { return m_edges; }
+    triangles_list_type get_elements() const { return m_elements; }
+    nodes_list_type get_mass_centers() const { return m_mass_centers_elems; }
+    std::size_t get_nodes_size() const { return m_nodes.size(); }
+    std::size_t get_edges_size() const { return m_edges.size(); }
+    std::size_t get_elements_size() const { return m_elements.size(); }
 
 
 // HELPER FUNCTIONS
 // get_points
 public:
-    point_2d get_point_by_id(std::size_t node_index) { return m_nodes[node_index];}
+    point_2d get_point_by_id(std::size_t node_index) const { return m_nodes[node_index];}
 
 public:
-    point_2d get_mass_center(std::size_t triangle_id) { return m_mass_centers_elems[triangle_id];}
+    point_2d get_mass_center(std::size_t triangle_id) const { return m_mass_centers_elems[triangle_id];}
+
+public:
+    value_type get_triangle_area(std::size_t triangle_id) const { return m_areas_triangle[triangle_id];}
 
 public:
 // return points of triangle
-    nodes_list_type get_points_by_triangle_id(std::size_t idx)
+    nodes_list_type get_points_by_triangle_id(std::size_t idx) const
     {
         std::vector<std::size_t> triangle_points_indexes = get_node_id(idx);
 
@@ -136,20 +120,20 @@ public:
 
 public:
 // return global id of node with local index local_num_position at triangle_id
-    std::vector<std::size_t> get_node_id(std::size_t triangle_id)
+    std::vector<std::size_t> get_node_id(std::size_t triangle_id) const
     {
         return m_elements[triangle_id];
     }
 
 public:
-    value_type get_line_length(const point_2d& p1, const point_2d& p2)
+    value_type get_line_length(const point_2d& p1, const point_2d& p2) const
     {
         return std::sqrt(std::pow(p2.x() - p1.x(), 2) + std::pow(p2.y() - p2.x(), 2));
     }
 
 // get centers of triangle edges
 public:
-    nodes_list_type get_triangle_edges_centers(std::size_t triangle_id)
+    nodes_list_type get_triangle_edges_centers(std::size_t triangle_id) const
     {
         nodes_list_type triangle_points = get_points_by_triangle_id(triangle_id);
 
@@ -161,7 +145,7 @@ public:
     }
 
 public:
-    std::size_t get_dirichlet_bc_count()
+    std::size_t get_dirichlet_bc_count() const
     {
         std::size_t diriclet_nodes = 0;
 
@@ -182,7 +166,7 @@ public:
 
 public:
     // get l = |e_1|^2 + |e_2|^2 + |e_3|^2
-    value_type get_l(std::size_t triangle_id)
+    value_type get_l(std::size_t triangle_id) const
     {
         std::vector<index_type> triangle_points = get_node_id(triangle_id);
 
@@ -195,7 +179,7 @@ public:
     point_2d get_segment_meidan_point(
         const point_2d& first,
         const point_2d& second
-    )
+    ) const
     {
         return point_2d(
             std::fabs(first.x() - second.x()),
@@ -205,9 +189,6 @@ public:
 
 };
 
-
-} //
-} //
 } //
 
 #include <FEM2D/mesh/mesh_types/detail/mesh_base.inl>

@@ -14,7 +14,6 @@ template<
 {
     try
     {
-        // initialize equation params
         // May be we need some entry equation data parce?
 
         // set points and calculate fields at points

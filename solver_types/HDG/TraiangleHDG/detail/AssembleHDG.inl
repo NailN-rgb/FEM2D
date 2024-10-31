@@ -61,6 +61,17 @@ template<
             // A = A_1 + A_2 + A_3 + E
             this->calculate_A1(mesh_data, equation, lolcal_matrix, discrette_derivative, e);
 
+            //this->calculate_A2
+
+            //this->calculate_A3
+
+            //this->calculate_E
+
+            this->calculate_F_local(mesh_data, equation, lolcal_vector, e);
+
+            // Write realization
+            this->assemble_matrix(local_matrix, e);
+            this->assemble_vector(local_vector, e);
         }
 
     }
@@ -132,7 +143,7 @@ template<
         matrix_type &local_matrix,
         const matrix_type& discrette_derivative,
         const std::size_t element_index
-)
+) const 
 {
     try
     {
@@ -181,6 +192,31 @@ template<
 }
 
 
+
+template<
+    typename IndexType,
+    typename ValueType
+> bool AssembleHDG<IndexType, ValueType>::calculate_F_local(
+        const mesh_type_pointer & mesh_data,
+        const ell_equation_type &equation
+        vector_type &local_vector,
+        const std::size_t element_index
+) const 
+{
+    auto triangle_edges_centers = mesh_data->get_triangle_edges_centers(element_index);
+
+    value_type triangle_area = mesh_data->get_triangle_area(element_index);
+
+    local_vector(0) = triangle_area / 3 * (
+        equation.f_f(triangle_edges_centers[0].x(), triangle_edges_centers[0].y()) + 
+        equation.f_f(triangle_edges_centers[1].x(), triangle_edges_centers[1].y()) + 
+        equation.f_f(triangle_edges_centers[2].x(), triangle_edges_centers[2].y())  
+    ); 
+
+    return true;
+}
+
+
 template<
     typename IndexType,
     typename ValueType
@@ -188,7 +224,7 @@ template<
         matrix_type& phi,
         const point_2d& edge_center,
         const point_2d& triangle_mass_center
-)
+) const 
 {
     try
     {

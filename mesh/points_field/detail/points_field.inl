@@ -74,8 +74,7 @@ template<
         {
             if(i != j)
             {
-                if(
-                    (fabs(points[i].first.x() - points[j].first.x()) < 1.e-6) 
+                if( (fabs(points[i].first.x() - points[j].first.x()) < 1.e-6) 
                     && (fabs(points[i].first.y() - points[j].first.y()) < 1.e-6)
                 )
                 {

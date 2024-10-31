@@ -6,10 +6,7 @@
 #include <FEM2D/mesh/trianglemesh/trianglemesh.h>
 #include <FEM2D/mesh/mesh_types/mesh_base.h>
 
-namespace FEM2D
-{
-
-namespace mesh
+namespace FEM2D::mesh
 {
 
 namespace bg = boost::geometry;
@@ -25,12 +22,10 @@ public:
     using index_type = IndexType;
     using value_type = ValueType;
 
-public:
     using point_2d     = typename bg::geo<value_type>::point_2d;
 	using segment_type = typename bg::geo<value_type>::segment_2d;
 	using polygon_2d   = typename bg::geo<value_type>::polygon_2d;
 
-public:
     using points_field_type = typename FEM2D::points_field::Points_field<IndexType, ValueType>;
     using triangle_mesh_t   = FEM2D::mesh::trianglemesh::TriangleMesh;
     using mesh_type         = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
@@ -41,19 +36,11 @@ public:
 // variables
 public:
     points_field_type m_points_field;
-
-public:
     triangle_mesh_pointer m_triangle_mesh; 
-
-// traingle mesh processing class
-public:
     mesh_type m_base_mesh;
     mesh_type_pointer m_base_mesh_pointer;
-
-public:
     bool m_write_output;
 
-// methods
 public:
     Mesh_builder() = default;
     Mesh_builder(const Mesh_builder& mesh_build) = default;
@@ -77,10 +64,7 @@ public:
 public:
     bool build_mesh();
     bool build_voronoi_mesh();
-
 };
-
-} //
 
 } //
 

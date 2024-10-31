@@ -26,7 +26,7 @@ public:
 
 public:
     BaseSolverStarter() = default;
-    BaseSolverStarter(const BaseSolverStarter& trifem) = default;
+    BaseSolverStarter(const BaseSolverStarter& triangle_solver) = default;
     ~BaseSolverStarter() = default;
 
 // virtual method need to be overrided at each child class

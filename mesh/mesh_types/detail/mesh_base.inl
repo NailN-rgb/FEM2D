@@ -3,13 +3,7 @@
 #include <FEM2D/precompiled.h>
 #include <FEM2D/mesh/mesh_types/mesh_base.h>
 
-namespace FEM2D
-{
-
-namespace mesh
-{
-    
-namespace mesh_types
+namespace FEM2D::mesh::mesh_types
 {
 
 template<
@@ -44,12 +38,12 @@ template<
     typename ValueType
 > bool MeshBase<IndexType, ValueType>::calculate_mesh_params()
 {
-    this->get_boundary_edges();
-    this->get_edges_length();
-    this->get_triangle_areas();
-    this->get_triangle_centers();
-    this->get_edges_centers();
-    this->get_triangles_mass_centers();
+    get_boundary_edges();
+    get_edges_length();
+    get_triangle_areas();
+    get_triangle_centers();
+    get_edges_centers();
+    get_triangles_mass_centers();
 
     return true;
 }
@@ -58,28 +52,25 @@ template<
 template<
     typename IndexType,
     typename ValueType
-> void MeshBase<IndexType, ValueType>::get_boundary_edges()
-{
-    // TODO: need to formulate edges attributes list first
-
-}
-
-
-template<
-    typename IndexType,
-    typename ValueType
 > void MeshBase<IndexType, ValueType>::get_edges_length()
 {
-    std::for_each(
-        m_edges.begin(),
-        m_edges.end(),
-        [this](std::vector<std::size_t> edge)
-        {
-            m_length_edges.push_back(
-                get_line_length(m_nodes[edge[0]], m_nodes[edge[1]])
-            );
-        }
-    );
+    try
+    {
+        std::for_each(
+            m_edges.begin(),
+            m_edges.end(),
+            [this](std::vector<std::size_t> edge)
+            {
+                m_length_edges.push_back(
+                    get_line_length(m_nodes[edge[0]], m_nodes[edge[1]])
+                );
+            }
+        );
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("MeshBase::get_edges_length:: " + std::string(e.what()));
+    }
 }
 
 
@@ -88,51 +79,57 @@ template<
     typename ValueType
 > void MeshBase<IndexType, ValueType>::get_triangle_areas()
 {
-    // by formula S = 1/2 * |(x_2 - x_1)(y_3 - y_1) - (x_3 - x_1)(y_2 - y_1)|
-    std::for_each(
-        m_elements.begin(),
-        m_elements.end(),
-        [this](std::vector<std::size_t> triangle)
-        {
-            m_areas_triangle.push_back(
-                0.5 * std::fabs(
-                    (m_nodes[triangle[1]].x() - m_nodes[triangle[0]].x()) * 
-                    (m_nodes[triangle[2]].y() - m_nodes[triangle[0]].y()) - 
-                    (m_nodes[triangle[2]].x() - m_nodes[triangle[0]].x()) *
-                    (m_nodes[triangle[1]].y() - m_nodes[triangle[0]].y())
-                )
-            );
-        }
-    );
+    try
+    {
+        // by formula S = 1/2 * |(x_2 - x_1)(y_3 - y_1) - (x_3 - x_1)(y_2 - y_1)|
+        std::for_each(
+            m_elements.begin(),
+            m_elements.end(),
+            [this](std::vector<std::size_t> triangle)
+            {
+                m_areas_triangle.push_back(
+                    0.5 * std::fabs(
+                        (m_nodes[triangle[1]].x() - m_nodes[triangle[0]].x()) * 
+                        (m_nodes[triangle[2]].y() - m_nodes[triangle[0]].y()) - 
+                        (m_nodes[triangle[2]].x() - m_nodes[triangle[0]].x()) *
+                        (m_nodes[triangle[1]].y() - m_nodes[triangle[0]].y())
+                    )
+                );
+            }
+        );
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("MeshBase::get_triangle_areas:: " + std::string(e.what()));
+    }
 }
 
-
-template<
-    typename IndexType,
-    typename ValueType
-> void MeshBase<IndexType, ValueType>::get_triangle_centers()
-{
-    // TODO: we need that?
-}
 
 template<
     typename IndexType,
     typename ValueType
 > void MeshBase<IndexType, ValueType>::get_edges_centers()
 {
-    std::for_each(
-        m_edges.begin(),
-        m_edges.end(),
-        [this](std::vector<std::size_t> edge)
-        {
-            m_centers_edges.push_back(
-                point_2d(
-                    (m_nodes[edge[0]].x() + m_nodes[edge[1]].x()) / 2,
-                    (m_nodes[edge[0]].y() + m_nodes[edge[1]].y()) / 2
-                )
-            );
-        }
-    );
+    try
+    {
+        std::for_each(
+            m_edges.begin(),
+            m_edges.end(),
+            [this](std::vector<std::size_t> edge)
+            {
+                m_centers_edges.push_back(
+                    point_2d(
+                        (m_nodes[edge[0]].x() + m_nodes[edge[1]].x()) / 2,
+                        (m_nodes[edge[0]].y() + m_nodes[edge[1]].y()) / 2
+                    )
+                );
+            }
+        );
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("MeshBase::get_edges_centers:: " + std::string(e.what()));
+    }
 }
 
 
@@ -141,21 +138,26 @@ template<
     typename ValueType
 > void MeshBase<IndexType, ValueType>::get_triangles_mass_centers()
 {
-    std::for_each(
-        m_elements.begin(),
-        m_elements.end(),
-        [this](std::vector<std::size_t> triangle)
-        {
-            m_mass_centers_elems.push_back(
-                point_2d(
-                    (m_nodes[triangle[0]].x() + m_nodes[triangle[1]].x() + m_nodes[triangle[2]].x()) / 3,
-                    (m_nodes[triangle[0]].y() + m_nodes[triangle[1]].y() + m_nodes[triangle[2]].y()) / 3
-                )
-            );
-        }
-    );
+    try
+    {
+        std::for_each(
+            m_elements.begin(),
+            m_elements.end(),
+            [this](std::vector<std::size_t> triangle)
+            {
+                m_mass_centers_elems.push_back(
+                    point_2d(
+                        (m_nodes[triangle[0]].x() + m_nodes[triangle[1]].x() + m_nodes[triangle[2]].x()) / 3,
+                        (m_nodes[triangle[0]].y() + m_nodes[triangle[1]].y() + m_nodes[triangle[2]].y()) / 3
+                    )
+                );
+            }
+        );
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("MeshBase::get_triangles_mass_centers:: " + std::string(e.what()));
+    }
 }
 
-} //
-} //
 } //

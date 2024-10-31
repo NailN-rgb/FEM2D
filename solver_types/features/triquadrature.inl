@@ -75,6 +75,4 @@ struct triquadrature
     }
 };
 
-
-
 }//
