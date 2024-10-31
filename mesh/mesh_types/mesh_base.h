@@ -155,9 +155,32 @@ public:
 
 
 // HELPER FUNCTIONS
+
+// get_points
+public:
+    point_2d get_point_by_id(std::size_t node_index)
+    {
+        return m_nodes[node_index];
+    }
+
+public:
+    point_2d get_mass_center(std::size_t triangle_id)
+    {
+        return m_mass_centers_elems[triangle_id];
+    }
+
 // return points of triangle
 public:
-    nodes_list_type get_points_by_triangle_id(index_type idx);
+    nodes_list_type get_points_by_triangle_id(index_type idx)
+    {
+        std::vector<index_type> triangle_points_indexes = get_node_id(idx);
+
+        return std::vector{
+            m_nodes[triangle_points_indexes[0]],
+            m_nodes[triangle_points_indexes[1]],
+            m_nodes[triangle_points_indexes[2]]
+        };
+    };
 
 // return global id of node with local index local_num_position at triangle_id
 public:
@@ -170,6 +193,19 @@ public:
     value_type get_line_length(const point_2d& p1, const point_2d& p2)
     {
         return std::sqrt(std::pow(p2.x() - p1.x(), 2) + std::pow(p2.y() - p2.x(), 2));
+    }
+
+// get centers of triangle edges
+public:
+    nodes_list_type get_triangle_edges_centers(std::size_t triangle_id)
+    {
+        nodes_list_type triangle_points = get_points_by_triangle_id(triangle_id);
+
+        return nodes_list_type{
+            get_segment_meidan_point(triangle_points[0], triangle_points[1]),
+            get_segment_meidan_point(triangle_points[1], triangle_points[2]),
+            get_segment_meidan_point(triangle_points[2], triangle_points[0]),
+        };
     }
 
 public:
@@ -190,6 +226,29 @@ public:
         );
 
         return diriclet_nodes;
+    }
+
+public:
+    // get l = |e_1|^2 + |e_2|^2 + |e_3|^2
+    value_type get_l(std::size_t triangle_id)
+    {
+        std::vector<index_type> triangle_points = get_node_id(triangle_id);
+
+        return std::pow(this->get_line_length(m_nodes[triangle_points[0]], m_nodes[triangle_points[1]]) ,2) +
+               std::pow(this->get_line_length(m_nodes[triangle_points[1]], m_nodes[triangle_points[2]]) ,2) +
+               std::pow(this->get_line_length(m_nodes[triangle_points[2]], m_nodes[triangle_points[0]]) ,2);
+    }
+
+public:
+    point_2d get_segment_meidan_point(
+        const point_2d& first,
+        const point_2d& second
+    )
+    {
+        return point_2d(
+            std::fabs(first.x() - second.x()),
+            std::fabs(first.y() - second.y())
+        );
     }
 
 };

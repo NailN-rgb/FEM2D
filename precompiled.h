@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <cassert>  
 #include <exception>
 
 #include <memory>
@@ -25,6 +26,7 @@
 #include <unordered_set>
 #include <tuple>
 #include <string>
+#include <utility> // std::pair
 
 #include <algorithm>
 #include <functional>

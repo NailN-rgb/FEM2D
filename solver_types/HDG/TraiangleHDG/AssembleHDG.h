@@ -81,6 +81,35 @@ public:
 public:
     bool assemble_equation(const mesh_type_pointer &mesh_data);
 
+private:
+    bool create_equation_system(
+        const mesh_type_pointer &mesh_data,
+        const ell_equation_type &equation
+    );
+
+private:
+    bool calculate_discrette_derivative_matrix(
+        const mesh_type_pointer & mesh_data,
+        matrix_type &derivative_matrix,
+        const std::size_t element_index
+    );
+
+private:
+    bool calculate_A1(
+        const mesh_type_pointer & mesh_data,
+        const ell_equation_type &equation
+        matrix_type &local_matrix,
+        const std::size_t element_index
+    );
+
+private:
+    bool get_phi_matrix(
+        matrix_type& phi,
+        const point_2d& edge_center,
+        const point_2d& triangle_mass_center
+    );
+
+
 };
 
 } //
