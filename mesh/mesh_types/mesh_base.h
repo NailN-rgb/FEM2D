@@ -27,44 +27,50 @@ private:
     using triangle_mesh_pointer = std::unique_ptr<triangle_mesh_t>; 
 
 // 1. List of nodes
-    using nodes_list_type = std::vector<point_2d>;
+    using nodes_list_type           = std::vector<point_2d>;
 // 2. Edges List
-    using edges_list_type = std::vector<std::vector<std::size_t>>;
+    using edges_list_type           = std::vector<std::pair<std::size_t, std::size_t>>;
 // 3. Triangles List
-    using triangles_list_type = std::vector<std::vector<std::size_t>>;
+    using triangles_list_type       = std::vector<std::vector<std::size_t>>;
+// Tri-Edge List
+    using tri_edge_list_type        = std::vector<std::vector<std::size_t>>;
 // 4. Boundary edges List
-    using boundary_edges_list_type = std::vector<std::pair<std::size_t, bool>>;
+    using boundary_edges_list_type  = std::vector<std::pair<std::size_t, bool>>;
 // 5. Length of edges
-    using edges_length_list_type = std::vector<value_type>;
+    using edges_length_list_type    = std::vector<value_type>;
 // 6. Triangle Areas
-    using triangle_areas_list_type = std::vector<value_type>;
+    using triangle_areas_list_type  = std::vector<value_type>;
 // 7. Triangles Center List
     using triangle_center_list_type = std::vector<point_2d>;
 // 8. Edges Center List
-    using edges_center_list_type = std::vector<point_2d>;
+    using edges_center_list_type    = std::vector<point_2d>;
 // 9. Elements mass centers List
-    using elems_mass_centers_list = std::vector<point_2d>;
+    using elems_mass_centers_list   = std::vector<point_2d>;
 // 10. Node boundary condition type
-    using nodes_bc_list_type = std::vector<std::size_t>;
+    using nodes_bc_list_type        = std::vector<std::size_t>;
 
 public:
-    nodes_list_type m_nodes;
-    nodes_bc_list_type m_node_markers;
-    edges_list_type m_edges;
-    triangles_list_type m_elements;
-    boundary_edges_list_type m_b_edges;
-    edges_length_list_type m_length_edges;
-    triangle_areas_list_type m_areas_triangle;
+    nodes_list_type           m_nodes;
+    triangles_list_type       m_elements;
+    nodes_bc_list_type        m_node_markers;
+    edges_list_type           m_edges;
+    boundary_edges_list_type  m_b_edges;
+    edges_length_list_type    m_length_edges;
+    triangle_areas_list_type  m_areas_triangle;
     triangle_center_list_type m_centers_triangle;
-    edges_center_list_type m_centers_edges;
-    elems_mass_centers_list m_mass_centers_elems;
+    edges_center_list_type    m_centers_edges;
+    elems_mass_centers_list   m_mass_centers_elems;
+    tri_edge_list_type        m_tri_edge;
 
+public:
+    // default 
+    std::string m_solver_type = "FEM";
 
 //ctors
 public:
-    MeshBase() = default;
+    MeshBase()                   = default;
     MeshBase(const MeshBase& mb) = default;
-    ~MeshBase() = default;
+    ~MeshBase()                  = default;
 
 // set nodes, edges, triangles 
 public:
@@ -80,7 +86,7 @@ public:
     void get_triangle_areas();
     void get_edges_centers();
     void get_triangles_mass_centers();
-
+    bool create_triangle_edge_connectivity();
 
 // class getters
 public:
@@ -104,6 +110,19 @@ public:
 
 public:
     value_type get_triangle_area(std::size_t triangle_id) const { return m_areas_triangle[triangle_id];}
+
+public:
+    auto get_traingle_edges_id(
+        std::size_t triangle_id
+    ) -> std::tuple<std::size_t, std::size_t, std::size_t>
+    {
+        return std::make_tuple(
+            m_tri_edge[triangle_id][0],
+            m_tri_edge[triangle_id][1],
+            m_tri_edge[triangle_id][2],
+        );
+    }
+
 
 public:
 // return points of triangle

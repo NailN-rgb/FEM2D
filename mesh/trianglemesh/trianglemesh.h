@@ -146,17 +146,13 @@ public:
 	}
 
 public:
-	std::vector<std::vector<std::size_t>> get_segments_list(const triangulateio &io)
+	auto get_segments_list(const triangulateio &io) -> std::pair<std::size_t, std::size_t>
 	{
-		std::vector<std::vector<std::size_t>> segments_list;
+		std::vector<std::pair<std::size_t, std::size_t>> segments_list;
 
 		for(auto pt = io.edgelist; pt != io.edgelist + 2 * io.numberofedges; pt+=2)
 		{
-			std::vector<std::size_t> segment;
-			segment.push_back(*pt - 1);
-			segment.push_back(*(pt + 1) - 1);
-
-			segments_list.push_back(segment);
+			segments_list.push_back({*pt - 1, *(pt + 1) - 1});
 		}
 
 		return segments_list;

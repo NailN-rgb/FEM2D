@@ -31,6 +31,7 @@ class AssembleHDG
     using point_2d = typename bg::geo<value_type>::point_2d;
 
     using vector_of_values = std::vector<value_type>;
+    using tri_edge_list    = std::vector<std::tuple(std::size_t, std::size_t, std::size_t)>;
 
 // mesh type
     using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
@@ -54,8 +55,15 @@ private:
 // degree of freedom
 private:
     std::size_t m_dof = 4;
+    std::size_t m_system_size;
     std::size_t m_nodes_count;
     std::size_t m_elems_count;
+
+private:
+    mesh_type_pointer m_mesh;
+
+private:
+    tri_edge_list m_triedge;
 
 public:
     AssembleHDG() = default;
@@ -63,24 +71,22 @@ public:
     ~AssembleHDG() = default;
 
 public:
-    bool assemble_equation(const mesh_type_pointer &mesh_data);
+    bool assemble_equation(const mesh_type_pointer&mesh_data);
 
 private:
-    bool create_equation_system(
-        const mesh_type_pointer &mesh_data,
-        const ell_equation_type &equation
-    );
+    bool locate_datas(const mesh_type_pointer& mesh_data);
+
+private:
+    bool create_equation_system(const ell_equation_type &equation);
 
 private:
     bool calculate_discrette_derivative_matrix(
-        const mesh_type_pointer & mesh_data,
         matrix_type &derivative_matrix,
         const std::size_t element_index
     );
 
 private:
     bool calculate_A1(
-        const mesh_type_pointer & mesh_data,
         const ell_equation_type &equation
         matrix_type &local_matrix,
         const matrix_type& discrette_derivative,
@@ -89,7 +95,6 @@ private:
 
 private:
     bool calculate_F_local(
-        const mesh_type_pointer & mesh_data,
         const ell_equation_type &equation
         vector_type &local_vector,
         const std::size_t element_index

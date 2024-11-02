@@ -45,6 +45,8 @@ template<
     get_edges_centers();
     get_triangles_mass_centers();
 
+    create_triangle_edge_connectivity();
+
     return true;
 }
 
@@ -59,10 +61,10 @@ template<
         std::for_each(
             m_edges.begin(),
             m_edges.end(),
-            [this](std::vector<std::size_t> edge)
+            [this](std::pair<std::size_t, std::size_t> edge)
             {
                 m_length_edges.push_back(
-                    get_line_length(m_nodes[edge[0]], m_nodes[edge[1]])
+                    get_line_length(m_nodes[edge.first], m_nodes[edge.second])
                 );
             }
         );
@@ -115,12 +117,12 @@ template<
         std::for_each(
             m_edges.begin(),
             m_edges.end(),
-            [this](std::vector<std::size_t> edge)
+            [this](std::pair<std::size_t, std::size_t> edge)
             {
                 m_centers_edges.push_back(
                     point_2d(
-                        (m_nodes[edge[0]].x() + m_nodes[edge[1]].x()) / 2,
-                        (m_nodes[edge[0]].y() + m_nodes[edge[1]].y()) / 2
+                        (m_nodes[edge.first].x() + m_nodes[edge.second].x()) / 2,
+                        (m_nodes[edge.first].y() + m_nodes[edge.second].y()) / 2
                     )
                 );
             }
@@ -157,6 +159,44 @@ template<
     catch(const std::exception& e)
     {
         throw std::runtime_error("MeshBase::get_triangles_mass_centers:: " + std::string(e.what()));
+    }
+}
+
+
+template<
+    typename IndexType,
+    typename ValueType
+> bool MeshBase<IndexType, ValueType>::create_triangle_edge_connectivity()
+{
+    // Dictionary for find edge index
+    unordered_map<pair<std::size_t, std::size_t>, std::size_t, hash<pair<std::size_t, std::size_t>>> edge_indexes;
+    for (std::size_t i = 0; i < edges.size(); ++i) 
+    {
+        std::size_t u = edges[i].first;
+        std::size_t v = edges[i].second;
+
+        if (u > v) {swap(u, v);}
+        edge_indexes[{u, v}] = i; // Save edge index
+    }
+
+    for(const auto& triangle : m_elements)
+    {
+        std::vector<std::size_type> edges_indexes;
+
+        for(std::size_t i = 0; i < 3; i++)
+        {
+            std::size_t u = triangle[i];
+            std::size_t v = triangle[(i + 1) % 3]; 
+
+            if (u > v) {swap(u, v);} 
+
+            if (edge_indexes.find({u, v}) != edge_indexes.end()) 
+            {
+                edges_indexes.push_back(edge_indexes[{u, v}]);
+            }
+        }
+
+        m_tri_edge.push_back(edge_indexes);
     }
 }
 
