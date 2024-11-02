@@ -22,6 +22,9 @@ template<
         // get edges
         m_edges = triangle_mesh->get_segments_list(triangle_mesh->in_);
 
+        // get marekers at edges
+        m_edge_markers = triangle_mesh->get_segment_marker_list(triangle_mesh->in_)
+
         // get triangles
         m_elements = triangle_mesh->get_triangle_list(triangle_mesh->in_);
     }

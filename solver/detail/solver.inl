@@ -3,9 +3,10 @@
 #include <FEM2D/mesh/mesh_builder.h>
 #include <FEM2D/mesh/mesh_types/mesh_base.h>
 #include <FEM2D/solver_types/base_solver.h>
-#include <FEM2D/solver_types/FEM/TriangleMeshFEM/TriangleFEMStarter.h>
 #include <FEM2D/SolversFactory/SolversFactory.h>
 
+#include <FEM2D/solver_types/FEM/TriangleMeshFEM/TriangleFEMStarter.h>
+#include <FEM2D/solver_types/HDG/TraiangleHDG/TriangleHDGStarter.h>
 
 namespace FEM2D
 {
@@ -26,7 +27,7 @@ template<
         auto mesh_ptr = mesh.build_mesh(true);
 
         // get pointer-to-solver 
-        auto solver = FEM2D::Factories::SolverFactory<index_type, value_type>::create_solver("FEM");
+        auto solver = FEM2D::Factories::SolverFactory<index_type, value_type>::create_solver("HDG");
 
         if(solver->solve(1, mesh_ptr))
         {

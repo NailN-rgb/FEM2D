@@ -9,7 +9,10 @@ namespace FEM2D::solvers::TriHDG
 template<
     typename IndexType,
     typename ValueType
-> bool AssembleHDG<IndexType, ValueType>::assemble_equation(const mesh_type_pointer &mesh_data)
+> bool AssembleHDG<IndexType, ValueType>::assemble_equation(
+    const mesh_type_pointer &mesh_data,
+    const ell_equation_type& equation
+)
 {
     try
     {
@@ -17,11 +20,15 @@ template<
         locate_datas(mesh_data);
 
         // create equation system 
+        create_equation_system(equation);
 
         // assemble BC
+        assemble_boundary_conditions(equation);
 
         // Solve SLES
+        m_solution = arma::solve(m_global_matrix, m_global_vector);
 
+        get_solution_error();
         // postrocessing ?
 
         // visualization
@@ -30,7 +37,7 @@ template<
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("AssembleHDG::assemble_equation " + std::string(e.what));
+        throw std::runtime_error("AssembleHDG::assemble_equation " + std::string(e.what));
     }
 
     return true;
@@ -46,8 +53,11 @@ template<
     {
         m_mesh = std::move(mesh_data);
 
+        m_edges_count = m_mesh->get_edges_size();
+        m_elems_count = m_mesh->get_elements_size();
+
         // size of Linear Equations System
-        m_system_size = m_mesh->get_edges_size() + m_mesh->get_elements_size();
+        m_system_size = m_edges_count + m_elems_count;
 
         // locate global HDG matrix & rhs memory
         m_global_matrix.zeros(m_system_size, m_system_size);
@@ -55,7 +65,7 @@ template<
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("AssembleHDG::assemble_equation " + std::string(e.what));
+        throw std::runtime_error("AssembleHDG::assemble_equation " + std::string(e.what));
     }
     
 }
@@ -64,7 +74,7 @@ template<
 template<
     typename IndexType,
     typename ValueType
-> bool AssembleHDG<IndexType, ValueType>::assemble_equation(const ell_equation_type &equation)
+> bool AssembleHDG<IndexType, ValueType>::create_equation_system(const ell_equation_type &equation)
 {
     try
     {
@@ -80,6 +90,9 @@ template<
         // loop by triangles
         for(std::size_t e = 0; e < N_triangles; e++)
         {
+            local_matrix = arma::zeros(m_dof, m_dof);
+            local_rhs    = arma::zeros(m_dof);
+
             // calculate discrette dirivative matrix for element
             this->calculate_discrette_derivative_matrix(discrette_derivative, e);
 
@@ -99,11 +112,10 @@ template<
             this->assemble_matrix(local_matrix, e);
             this->assemble_vector(local_vector, e);
         }
-
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("AssembleHDG::assemble_equation " + std::string(e.what));
+        throw std::runtime_error("AssembleHDG::assemble_equation " + std::string(e.what));
     }
 
     return true;
@@ -154,7 +166,7 @@ template<
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("AssembleHDG::calculate_discrette_derivative_matrix " + std::string(e.what));
+        throw std::runtime_error("AssembleHDG::calculate_discrette_derivative_matrix " + std::string(e.what));
     }
 }
 
@@ -211,7 +223,7 @@ template<
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("AssembleHDG::calculate_A1 " + std::string(e.what));
+        throw std::runtime_error("AssembleHDG::calculate_A1 " + std::string(e.what));
     }
 }
 
@@ -242,7 +254,7 @@ template<
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("AssembleHDG::calculate_F_local " + std::string(e.what));
+        throw std::runtime_error("AssembleHDG::calculate_F_local " + std::string(e.what));
     }
     
 
@@ -274,14 +286,14 @@ template<
         {
             for(std::size_t j = 0; j < 4; j++)
             {
-                m_global_matrix(assembling_indexes[i], assembling_indexes[j]) +=
+                m_global_matrix(std::get<i>(assembling_indexes), std::get<j>(assembling_indexes)) +=
                     local_matrix(i, j);
             }
         }
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("AssembleHDG::assemble_matrix " + std::string(e.what));
+        throw std::runtime_error("AssembleHDG::assemble_matrix " + std::string(e.what));
     }
     
 }
@@ -310,13 +322,13 @@ template<
 
         for(std::size_t i = 0; i < 4; i++)
         {
-            m_global_vector(assembling_indexes[i]) += 
+            m_global_vector(std::get<i>(assembling_indexes)) += 
                 m_local_vector(i);
         }
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("AssembleHDG::assemble_vector " + std::string(e.what));    
+        throw std::runtime_error("AssembleHDG::assemble_vector " + std::string(e.what));    
     }
     
 }
@@ -344,9 +356,158 @@ template<
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("AssembleHDG::get_phi_matrix " + std::string(e.what));
+        throw std::runtime_error("AssembleHDG::get_phi_matrix " + std::string(e.what));
     }
     
+}
+
+
+template<
+    typename IndexType,
+    typename ValueType
+> bool AssembleHDG<IndexType, ValueType>::assemble_boundary_conditions(const ell_equation_type &ell_equation)
+{
+    try
+    {
+        // get list of edges that have voundary condition
+
+        auto boundary_markers = m_mesh->get_bc_edge_markers();
+
+        // sets of boundary edges
+        std::unordered_set<std::size_t> first_bc_edges;
+        std::unordered_set<std::size_t> third_bc_edges;
+
+        std::size_t edge_idx = 0;
+
+        std::for_each(
+            boundary_markers.begin(),
+            boundary_markers.end(),
+            [&](const auto& marker)
+            {
+                if(marker == 1)
+                {
+                    first_bc_edges.insert(edge_idx);
+                }
+                else if(marker == 3)
+                {
+                    third_bc_edges.insert(edge_idx);
+                }
+                else
+                {
+                    throw std::runtime_error("Unknown type of BC at " + edge_idx + "edge");
+                }
+
+                edge_idx++;
+            }
+        );
+
+        // TODO: not realized yet
+        // assemble_third_bc();
+
+        assemble_first_bc();
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("AssembleHDG::assemble_boundary_conditions " + std::string(e.what));
+    }
+
+    return true;
+}
+
+template<typename NodesList>
+template<
+    typename IndexType,
+    typename ValueType
+> bool AssembleHDG<IndexType, ValueType>::assemble_first_bc(
+        NodesList indexes,
+        const ell_equation_type &ell_equation
+)
+{
+    try
+    {
+        // offset of system
+        auto offset = m_elems_count;
+
+        // get solution at first BC edges
+        for(std::size_t i = 0; i < m_edges_count; i++)
+        {
+            // if node have a Dirichlet bc marker 
+            if(nodes.count(i) > 0)
+            {
+                auto edge_center = m_mesh->get_point_by_edge_id(i);
+                value_type expl_solution = ell_equation.sol_f(edge_center.x(), edge_center.y());
+
+                m_solution(offset + i) = expl_solution;
+            }
+        }
+
+        // change rhs vector elements
+        for(std::size_t i = 0; i < m_edges_count; i++)
+        {
+            m_global_vector(offset + i) -= arma::dot(m_global_matrix.row(offset + i), m_solution);
+        }
+
+        // assemble to global matrix
+        for(std::size_t i = 0; i < m_edges_count; i++)
+        {
+            // if node have a Dirichlet bc marker 
+            if(nodes.count(i) > 0)
+            {
+                arma::rowvec row(m_system_size);
+
+                vector_type col(m_system_size);
+                // TODO: rewrite this
+                col(offset + i) = m_solution(i) > 0.00001 ? m_global_vector(i) / m_solution(offset + i) : 1e9;
+
+                m_global_matrix.row(offset + i) = row;
+                m_global_matrix.col(offset + i) = col;
+            }
+        }
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("AssembleHDG::assemble_first_bc " + std::string(e.what));
+    }   
+}
+
+
+template<
+    typename IndexType,
+    typename ValueType
+> void AssembleHDG<IndexType, ValueType>::get_solution_error(const ell_equation_type& equation)
+{
+    // get true solution
+    std::vector<value_type> true_solution;
+    std::vector<value_type> error;
+    // 1. calclulate at triangles
+    for(std::size_t i = 0; i < m_mesh->get_elements_size(); i++)
+    {
+        auto triangle_center = m_mesh->get_mass_center(i);
+        true_solution.push_back(
+            equation.sol_f(triangle_center.x(), triangle_center.y());
+        );
+    }
+
+    // 2. Calculate at edges
+    for(std::size_t i = 0; i < m_mesh->get_edges_size(); i++)
+    {
+        auto edge_center = m_mesh->get_point_by_edge_id(i);
+        true_solution.push_back(
+            equation.sol_f(edge_center.x(), edge_center.y());
+        );
+    }
+
+    for(std::size_t i = 0; i < m_system_size; i++)
+    {
+        error.push_back(std::fabs(m_solution(i) - true_solution[i]));
+    }
+
+    std::sort(
+        error.begin(),
+        error.end()
+    );
+
+    std::cout << "Max Error is " << error.back() << std::endl;
 }
 
 } //

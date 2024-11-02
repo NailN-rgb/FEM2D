@@ -77,7 +77,7 @@ public:
     AssembleEquation(const AssembleEquation& ae) = default;
     ~AssembleEquation() = default;
 
-// class algorithms entry function
+// entry function to class algorithms
 public:
     bool assemble_equation(
         const mesh_type_pointer &mesh_data,
@@ -97,7 +97,7 @@ private:
         const mesh_type_pointer &trimesh,
         const std::vector<point_2d> &triangle_points,
         value_type tri_area
-        );
+    );
     
 private:
     bool assemble_matrix(const matrix_type& local_matrix, const std::vector<std::size_t> &global_indeces);

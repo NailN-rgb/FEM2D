@@ -32,10 +32,8 @@ private:
     using edges_list_type           = std::vector<std::pair<std::size_t, std::size_t>>;
 // 3. Triangles List
     using triangles_list_type       = std::vector<std::vector<std::size_t>>;
-// Tri-Edge List
+// 4. Tri-Edge List
     using tri_edge_list_type        = std::vector<std::vector<std::size_t>>;
-// 4. Boundary edges List
-    using boundary_edges_list_type  = std::vector<std::pair<std::size_t, bool>>;
 // 5. Length of edges
     using edges_length_list_type    = std::vector<value_type>;
 // 6. Triangle Areas
@@ -48,12 +46,15 @@ private:
     using elems_mass_centers_list   = std::vector<point_2d>;
 // 10. Node boundary condition type
     using nodes_bc_list_type        = std::vector<std::size_t>;
+// 11. Edges bouundary condition type 
+    using edges_bc_list_type        = std::vector<std::size_t>;
 
 public:
     nodes_list_type           m_nodes;
     triangles_list_type       m_elements;
     nodes_bc_list_type        m_node_markers;
     edges_list_type           m_edges;
+    edges_bc_list_type        m_edge_markers;
     boundary_edges_list_type  m_b_edges;
     edges_length_list_type    m_length_edges;
     triangle_areas_list_type  m_areas_triangle;
@@ -93,6 +94,7 @@ public:
     nodes_list_type get_points() const { return m_nodes; }
     nodes_bc_list_type get_bc_markers() const { return m_node_markers; }
     edges_list_type get_edges() const { return m_edges; }
+    edges_bc_list_type get_bc_edge_markers() const { return m_edge_markers; }
     triangles_list_type get_elements() const { return m_elements; }
     nodes_list_type get_mass_centers() const { return m_mass_centers_elems; }
     std::size_t get_nodes_size() const { return m_nodes.size(); }
@@ -110,6 +112,15 @@ public:
 
 public:
     value_type get_triangle_area(std::size_t triangle_id) const { return m_areas_triangle[triangle_id];}
+
+public:
+    point_2d get_point_by_edge_id(std::size_t edge_index) const 
+    {
+        return get_segment_meidan_point(
+            get_point_by_id(m_edges[edge_index].first),
+            get_point_by_id(m_edges[edge_index].second)
+        );
+    }
 
 public:
     auto get_traingle_edges_id(

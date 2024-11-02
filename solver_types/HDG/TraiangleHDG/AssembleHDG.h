@@ -56,7 +56,7 @@ private:
 private:
     std::size_t m_dof = 4;
     std::size_t m_system_size;
-    std::size_t m_nodes_count;
+    std::size_t m_edges_count;
     std::size_t m_elems_count;
 
 private:
@@ -71,7 +71,10 @@ public:
     ~AssembleHDG() = default;
 
 public:
-    bool assemble_equation(const mesh_type_pointer&mesh_data);
+    bool assemble_equation(
+        const mesh_type_pointer& mesh_data,
+        const ell_equation_type& equation
+    );
 
 private:
     bool locate_datas(const mesh_type_pointer& mesh_data);
@@ -118,6 +121,25 @@ private:
         const point_2d& edge_center,
         const point_2d& triangle_mass_center
     ) const;
+
+private:
+    bool assemble_boundary_conditions(
+        const ell_equation_type &ell_equation
+    );
+
+private:
+    template<typename NodesList>
+    void assemble_first_bc(
+        NodesList indexes,
+        const ell_equation_type &ell_equation
+    );
+
+private:
+    template<typename NodesList>
+    void assemble_third_bc(NodesList nodes);
+
+private:
+    void get_solution_error();
 
 };
 
