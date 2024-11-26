@@ -23,7 +23,7 @@ template<
         m_edges = triangle_mesh->get_segments_list(triangle_mesh->in_);
 
         // get marekers at edges
-        m_edge_markers = triangle_mesh->get_segment_marker_list(triangle_mesh->in_)
+        m_edge_markers = triangle_mesh->get_segment_marker_list(triangle_mesh->in_);
 
         // get triangles
         m_elements = triangle_mesh->get_triangle_list(triangle_mesh->in_);
@@ -41,10 +41,8 @@ template<
     typename ValueType
 > bool MeshBase<IndexType, ValueType>::calculate_mesh_params()
 {
-    get_boundary_edges();
     get_edges_length();
     get_triangle_areas();
-    get_triangle_centers();
     get_edges_centers();
     get_triangles_mass_centers();
 
@@ -172,26 +170,30 @@ template<
 > bool MeshBase<IndexType, ValueType>::create_triangle_edge_connectivity()
 {
     // Dictionary for find edge index
-    unordered_map<pair<std::size_t, std::size_t>, std::size_t, hash<pair<std::size_t, std::size_t>>> edge_indexes;
-    for (std::size_t i = 0; i < edges.size(); ++i) 
-    {
-        std::size_t u = edges[i].first;
-        std::size_t v = edges[i].second;
+    std::map<
+        std::pair<std::size_t, std::size_t>,
+        std::size_t
+    > edge_indexes;
 
-        if (u > v) {swap(u, v);}
+    for (std::size_t i = 0; i < m_edges.size(); ++i) 
+    {
+        std::size_t u = m_edges[i].first;
+        std::size_t v = m_edges[i].second;
+
+        if (u > v) {std::swap(u, v);}
         edge_indexes[{u, v}] = i; // Save edge index
     }
 
     for(const auto& triangle : m_elements)
     {
-        std::vector<std::size_type> edges_indexes;
+        std::vector<std::size_t> edges_indexes;
 
         for(std::size_t i = 0; i < 3; i++)
         {
             std::size_t u = triangle[i];
             std::size_t v = triangle[(i + 1) % 3]; 
 
-            if (u > v) {swap(u, v);} 
+            if (u > v) {std::swap(u, v);} 
 
             if (edge_indexes.find({u, v}) != edge_indexes.end()) 
             {
@@ -199,8 +201,10 @@ template<
             }
         }
 
-        m_tri_edge.push_back(edge_indexes);
+        m_tri_edge.push_back(edges_indexes);
     }
+
+    return true;
 }
 
 } //

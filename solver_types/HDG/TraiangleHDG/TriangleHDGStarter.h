@@ -1,7 +1,7 @@
 #pragma once
 
 #include <FEM2D/precompiled.h>
-#include <FEM2D/solver_types/HDG/TriangleHDG/AssembleHDG.h>
+#include <FEM2D/solver_types/HDG/TraiangleHDG/AssembleHDG.h>
 
 namespace FEM2D::solvers::TriHDG
 {
@@ -38,9 +38,9 @@ public:
 
 // call & complete matrix/RHS builder 
 private:
-    void solve_hdg_system(const mesh_type_pointer &mesh_data); 
+    bool solve_hdg_system(const mesh_type_pointer &mesh_data); 
 };
 
 } //
 
-#include <FEM2D/solver_types/HDG/TriangleHDG/detail/TriangleHDGStarter.inl>
+#include <FEM2D/solver_types/HDG/TraiangleHDG/detail/TriangleHDGStarter.inl>

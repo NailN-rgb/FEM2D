@@ -5,7 +5,6 @@
 namespace FEM2D::Factories
 {
 
-    
 template<
     typename IndexType,
     typename ValueType
@@ -13,8 +12,9 @@ template<
 {
     using base_solver_type = FEM2D::solvers::BaseSolver::BaseSolverStarter<IndexType, ValueType>;
     using FEM_solver_type  = FEM2D::solvers::TriFem::TriangleFEMStarter<base_solver_type>;
-public:// create base solver first
-    static std::unique_ptr<base_solver_type> create_solver(const std::string& method_name)
+    using HDG_solver_type  = FEM2D::solvers::TriHDG::TriangleHDGStarter<base_solver_type>;
+public:
+    static std::shared_ptr<base_solver_type> create_solver(const std::string& method_name)
     {
         if(method_name == "FEM")
         {
@@ -24,8 +24,7 @@ public:// create base solver first
         else if(method_name == "HDG")
         {
             // create HDG Starter Caller
-            //return std::make_unique<HDGSolver>;
-            throw std::runtime_error("HDG Solver not realized now");
+            return std::make_unique<HDG_solver_type>();
         }
         else if(method_name == "FVM")
         {

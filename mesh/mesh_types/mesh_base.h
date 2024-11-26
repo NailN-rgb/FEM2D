@@ -24,7 +24,7 @@ private:
     using line_2d      = typename bg::geo<value_type>::line_2d;
 
     using triangle_mesh_t       = FEM2D::mesh::trianglemesh::TriangleMesh;
-    using triangle_mesh_pointer = std::unique_ptr<triangle_mesh_t>; 
+    using triangle_mesh_pointer = std::shared_ptr<triangle_mesh_t>; 
 
 // 1. List of nodes
     using nodes_list_type           = std::vector<point_2d>;
@@ -55,7 +55,6 @@ public:
     nodes_bc_list_type        m_node_markers;
     edges_list_type           m_edges;
     edges_bc_list_type        m_edge_markers;
-    boundary_edges_list_type  m_b_edges;
     edges_length_list_type    m_length_edges;
     triangle_areas_list_type  m_areas_triangle;
     triangle_center_list_type m_centers_triangle;
@@ -123,14 +122,14 @@ public:
     }
 
 public:
-    auto get_traingle_edges_id(
+    auto get_triangle_edges_id(
         std::size_t triangle_id
     ) -> std::tuple<std::size_t, std::size_t, std::size_t>
     {
         return std::make_tuple(
             m_tri_edge[triangle_id][0],
             m_tri_edge[triangle_id][1],
-            m_tri_edge[triangle_id][2],
+            m_tri_edge[triangle_id][2]
         );
     }
 
@@ -141,7 +140,7 @@ public:
     {
         std::vector<std::size_t> triangle_points_indexes = get_node_id(idx);
 
-        return std::vector{
+        return nodes_list_type{
             m_nodes[triangle_points_indexes[0]],
             m_nodes[triangle_points_indexes[1]],
             m_nodes[triangle_points_indexes[2]]
@@ -198,7 +197,7 @@ public:
     // get l = |e_1|^2 + |e_2|^2 + |e_3|^2
     value_type get_l(std::size_t triangle_id) const
     {
-        std::vector<index_type> triangle_points = get_node_id(triangle_id);
+        std::vector<std::size_t> triangle_points = get_node_id(triangle_id);
 
         return std::pow(this->get_line_length(m_nodes[triangle_points[0]], m_nodes[triangle_points[1]]) ,2) +
                std::pow(this->get_line_length(m_nodes[triangle_points[1]], m_nodes[triangle_points[2]]) ,2) +

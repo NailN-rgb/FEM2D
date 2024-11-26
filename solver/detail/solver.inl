@@ -2,11 +2,15 @@
 
 #include <FEM2D/mesh/mesh_builder.h>
 #include <FEM2D/mesh/mesh_types/mesh_base.h>
-#include <FEM2D/solver_types/base_solver.h>
-#include <FEM2D/SolversFactory/SolversFactory.h>
+#include <FEM2D/equationInit/EllipticEquation.h>
 
 #include <FEM2D/solver_types/FEM/TriangleMeshFEM/TriangleFEMStarter.h>
 #include <FEM2D/solver_types/HDG/TraiangleHDG/TriangleHDGStarter.h>
+
+#include <FEM2D/solver_types/base_solver.h>
+#include <FEM2D/SolversFactory/SolversFactory.h>
+
+
 
 namespace FEM2D
 {

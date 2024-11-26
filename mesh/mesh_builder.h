@@ -30,8 +30,8 @@ public:
     using triangle_mesh_t   = FEM2D::mesh::trianglemesh::TriangleMesh;
     using mesh_type         = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
 
-    using triangle_mesh_pointer = std::unique_ptr<triangle_mesh_t>; 
-    using mesh_type_pointer     = std::unique_ptr<mesh_type>;
+    using triangle_mesh_pointer = std::shared_ptr<triangle_mesh_t>; 
+    using mesh_type_pointer     = std::shared_ptr<mesh_type>;
 
 // variables
 public:

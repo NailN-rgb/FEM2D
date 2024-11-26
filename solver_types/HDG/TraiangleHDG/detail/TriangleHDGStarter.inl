@@ -21,7 +21,7 @@ bool TriangleHDGStarter<BaseSolver>::solve(
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("TriangleHDGStarter::solve " + std::string(e.what));
+        std::runtime_error("TriangleHDGStarter::solve " + std::string(e.what()));
     }
 
     return true;
@@ -41,7 +41,7 @@ bool TriangleHDGStarter<BaseSolver>::solve_hdg_system(const mesh_type_pointer &m
     }
     catch(const std::exception& e)
     {
-        std::runtime_error("TriangleHDGStarter::solve_hdg_system " + std::string(e.what));
+        std::runtime_error("TriangleHDGStarter::solve_hdg_system " + std::string(e.what()));
     }
 
     return true;

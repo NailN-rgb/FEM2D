@@ -19,7 +19,7 @@ protected:
 
 protected:
     using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
-    using mesh_type_pointer = std::unique_ptr<mesh_type>;
+    using mesh_type_pointer = std::shared_ptr<mesh_type>;
 
 public:
     ell_equation_type m_elliptic_equation;

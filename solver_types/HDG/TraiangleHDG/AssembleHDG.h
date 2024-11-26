@@ -31,14 +31,14 @@ class AssembleHDG
     using point_2d = typename bg::geo<value_type>::point_2d;
 
     using vector_of_values = std::vector<value_type>;
-    using tri_edge_list    = std::vector<std::tuple(std::size_t, std::size_t, std::size_t)>;
+    using tri_edge_list    = std::vector<std::tuple<std::size_t, std::size_t, std::size_t>>;
 
 // mesh type
     using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
-    using mesh_type_pointer = std::unique_ptr<mesh_type>;
+    using mesh_type_pointer = std::shared_ptr<mesh_type>;
 
     using ell_equation_type = FEM2D::equation::EllepticEquation<index_type, value_type>;
-    using ell_equation_pointer_type = std::unique_ptr<ell_equation_type>;
+    using ell_equation_pointer_type = std::shared_ptr<ell_equation_type>;
 
 // boost compressed matrix
 // TODO: is really sparse?
@@ -90,7 +90,7 @@ private:
 
 private:
     bool calculate_A1(
-        const ell_equation_type &equation
+        const ell_equation_type &equation,
         matrix_type &local_matrix,
         const matrix_type& discrette_derivative,
         const std::size_t element_index
@@ -98,20 +98,20 @@ private:
 
 private:
     bool calculate_F_local(
-        const ell_equation_type &equation
+        const ell_equation_type &equation,
         vector_type &local_vector,
         const std::size_t element_index
     ) const;
 
 private:
     bool assemble_matrix(
-        const matrix_type& local_matrix,
+        matrix_type& local_matrix,
         std::size_t element_index
     );
 
 private:
     bool assemble_vector(
-        const vector_type& local_vector,
+        vector_type& local_vector,
         std::size_t element_index
     );
 
@@ -129,20 +129,20 @@ private:
 
 private:
     template<typename NodesList>
-    void assemble_first_bc(
+    bool assemble_first_bc(
         NodesList indexes,
         const ell_equation_type &ell_equation
     );
 
 private:
     template<typename NodesList>
-    void assemble_third_bc(NodesList nodes);
+    bool assemble_third_bc(NodesList nodes);
 
 private:
-    void get_solution_error();
+    void get_solution_error(const ell_equation_type& equation);
 
 };
 
 } //
 
-#include <FEM2D/solver_types/HDG/TriangleHDG/detail/AssembleHDG.inl>
+#include <FEM2D/solver_types/HDG/TraiangleHDG/detail/AssembleHDG.inl>

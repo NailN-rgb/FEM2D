@@ -46,7 +46,7 @@ template<
 			throw std::invalid_argument("file was not found or could not be read");
 		}
 
-        index_type number_of_points     {m_points_field.points.size()};
+        std::size_t number_of_points     {m_points_field.points.size()};
         index_type current_point_index  {1};
         
         //set header of file

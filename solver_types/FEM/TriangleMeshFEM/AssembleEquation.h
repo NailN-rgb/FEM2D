@@ -38,11 +38,11 @@ public:
 // mess type
 public:
     using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
-    using mesh_type_pointer = std::unique_ptr<mesh_type>;
+    using mesh_type_pointer = std::shared_ptr<mesh_type>;
 
 public:
     using ell_equation_type = FEM2D::equation::EllepticEquation<index_type, value_type>;
-    using ell_equation_pointer_type = std::unique_ptr<ell_equation_type>;
+    using ell_equation_pointer_type = std::shared_ptr<ell_equation_type>;
 
 // boost compressed matrix
 // TODO: is really sparse?

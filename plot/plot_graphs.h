@@ -50,7 +50,7 @@ bool PlotMesh(
 
         // get mesh datas
         std::vector<point_type> points = mesh->get_points();
-        std::vector<std::vector<index_type>> segments = mesh->get_edges();
+        std::vector<std::pair<std::size_t, std::size_t>> segments = mesh->get_edges();
         std::vector<std::vector<index_type>> triangles = mesh->get_elements();
 
         std::vector<double> x(points.size());
@@ -79,11 +79,11 @@ bool PlotMesh(
             segments.end(),
             [&x_edge, &y_edge, &points](const auto& edge_points)
             {
-                x_edge[0] = points[edge_points[0]].x();
-                x_edge[1] = points[edge_points[1]].x();
+                x_edge[0] = points[edge_points.first].x();
+                x_edge[1] = points[edge_points.second].x();
 
-                y_edge[0] = points[edge_points[0]].y();
-                y_edge[1] = points[edge_points[1]].y();
+                y_edge[0] = points[edge_points.first].y();
+                y_edge[1] = points[edge_points.second].y();
 
                 matplotlibcpp::plot(x_edge, y_edge, "r");
             }

@@ -147,7 +147,7 @@ public:
 	
 
 public:
-	auto get_segments_list(const triangulateio &io) -> std::pair<std::size_t, std::size_t>
+	auto get_segments_list(const triangulateio &io) -> std::vector<std::pair<std::size_t, std::size_t>>
 	{
 		std::vector<std::pair<std::size_t, std::size_t>> segments_list;
 
@@ -166,6 +166,7 @@ public:
 
 		for(auto pt_m = io.edgemarkerlist; pt_m != io.edgemarkerlist + io.numberofedges; pt_m++)
 		{
+
 			result.push_back(*pt_m);
 		}
 
