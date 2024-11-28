@@ -209,16 +209,16 @@ template<
         matrix_type M = arma::zeros(3, 3);
 
         // function for calculate matrix A at point
-        // auto A_func = [&equation](const point_2d point){
-        //     matrix_type A_matr(2,2);
+        auto A_func = [&equation](const point_2d point){
+            matrix_type A_matr(2,2);
 
-        //     A_matr(0,0) = equation.f_a11(point.x(), point.y()); 
-        //     A_matr(1,0) = equation.f_a21(point.x(), point.y()); 
-        //     A_matr(0,1) = equation.f_a12(point.x(), point.y()); 
-        //     A_matr(1,1) = equation.f_a22(point.x(), point.y());
+            A_matr(0,0) = equation.f_a11(point.x(), point.y()); 
+            A_matr(1,0) = equation.f_a21(point.x(), point.y()); 
+            A_matr(0,1) = equation.f_a12(point.x(), point.y()); 
+            A_matr(1,1) = equation.f_a22(point.x(), point.y());
 
-        //     return A_matr; 
-        // };
+            return A_matr; 
+        };
 
         // get edge's centers
         // get list of edges centers
@@ -226,29 +226,20 @@ template<
 
         auto triangle_points = m_mesh->get_points_by_triangle_id(element_index);
 
-        auto triangle_center = m_mesh->get_mass_center(element_index);
-        auto triangle_area   = m_mesh->get_triangle_area(element_index);
-
         // ****TODO: not finished, how work this formulas?
         // get 2'd order Gauss quadrature points std::pair<tuple<point_2d>, tuple<value_type>>
-        //auto quadrature_data  = FEM2D::solvers::features::triquadrature::get_quad_2(triangle_points);
+        auto quadrature_data  = FEM2D::solvers::features::triquadrature::get_quad_2(triangle_points);
 
-        // for(std::size_t s = 0; s < 3; s++)
-        // {
-        //     // get PHI
-        //     this->get_phi_matrix(phi, triangle_edges_centers[s], m_mesh->get_mass_center(element_index));
+        for(std::size_t s = 0; s < 3; s++)
+        {
+            // get PHI
+            this->get_phi_matrix(phi, triangle_edges_centers[s], m_mesh->get_mass_center(element_index));
 
-        //     // .t() - transpose function
-        //     matrix_type add_part = quadrature_data.second[s] *
-        //         phi.t() * A_func(quadrature_data.first[s]) * phi;
-        //     M = M + add_part;
-        // }
-
-        auto function_on_tri_center = equation.f_a11(triangle_center.x(), triangle_center.y()); 
-
-        M(0, 0) = function_on_tri_center * triangle_area;
-        M(1, 1) = function_on_tri_center * triangle_area;
-        M(2, 2) = function_on_tri_center * triangle_area * m_mesh->get_l(element_index) / 36;
+            // .t() - transpose function
+            matrix_type add_part = quadrature_data.second[s] *
+                phi.t() * A_func(quadrature_data.first[s]) * phi;
+            M = M + add_part;
+        }
 
         local_matrix += discrette_derivative.t() * M * discrette_derivative;
 
