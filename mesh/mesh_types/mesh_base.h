@@ -157,7 +157,7 @@ public:
 public:
     value_type get_line_length(const point_2d& p1, const point_2d& p2) const
     {
-        return std::sqrt(std::pow(p2.x() - p1.x(), 2) + std::pow(p2.y() - p2.x(), 2));
+        return std::sqrt(std::pow(p2.x() - p1.x(), 2) + std::pow(p2.y() - p1.y(), 2));
     }
 
 // get centers of triangle edges
@@ -199,9 +199,9 @@ public:
     {
         std::vector<std::size_t> triangle_points = get_node_id(triangle_id);
 
-        return std::pow(this->get_line_length(m_nodes[triangle_points[0]], m_nodes[triangle_points[1]]) ,2) +
-               std::pow(this->get_line_length(m_nodes[triangle_points[1]], m_nodes[triangle_points[2]]) ,2) +
-               std::pow(this->get_line_length(m_nodes[triangle_points[2]], m_nodes[triangle_points[0]]) ,2);
+        return std::pow(this->get_line_length(m_nodes[triangle_points[0]], m_nodes[triangle_points[1]]) , 2) +
+               std::pow(this->get_line_length(m_nodes[triangle_points[1]], m_nodes[triangle_points[2]]) , 2) +
+               std::pow(this->get_line_length(m_nodes[triangle_points[2]], m_nodes[triangle_points[0]]) , 2);
     }
 
 public:
@@ -210,9 +210,10 @@ public:
         const point_2d& second
     ) const
     {
+        // delta x / 2 + point with minimal x-coordinate value
         return point_2d(
-            std::fabs(first.x() - second.x()),
-            std::fabs(first.y() - second.y())
+            std::fabs((first.x() - second.x()) / 2) + (first.x() > second.x() ? second.x() : first.x()),
+            std::fabs((first.y() - second.y()) / 2) + (first.y() > second.y() ? second.y() : first.y())
         );
     }
 

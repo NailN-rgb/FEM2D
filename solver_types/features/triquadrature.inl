@@ -42,7 +42,7 @@ struct triquadrature
         };
 
         // quadrature points weights
-        std::vector<double> quad_weights = {1/6, 1/6, 1/6};
+        std::vector<double> quad_weights = {1./6., 1./6., 1./6.};
 
         return std::make_pair(quad_points_calculated, quad_weights);
     }

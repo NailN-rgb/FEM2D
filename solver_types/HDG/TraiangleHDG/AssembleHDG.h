@@ -139,7 +139,7 @@ private:
     bool assemble_third_bc(NodesList nodes);
 
 private:
-    void get_solution_error(const ell_equation_type& equation);
+    bool get_solution_error(const ell_equation_type& equation);
 
 };
 

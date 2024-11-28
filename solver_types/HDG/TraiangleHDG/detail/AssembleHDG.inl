@@ -25,15 +25,19 @@ template<
         // assemble BC
         assemble_boundary_conditions(equation);
 
+        // #ifdef NDEBUG
+        m_global_matrix.save("HDG matrix.txt", arma::raw_ascii);
+
+        m_global_vector.save("HDG vector.txt", arma::raw_ascii);
+        // #endif
+
         // Solve SLES
         m_solution = arma::solve(m_global_matrix, m_global_vector);
 
-        //get_solution_error();
+        get_solution_error(equation);
         // postrocessing ?
 
         // visualization
-
-
     }
     catch(const std::exception& e)
     {
@@ -62,6 +66,9 @@ template<
         // locate global HDG matrix & rhs memory
         m_global_matrix.zeros(m_system_size, m_system_size);
         m_global_vector.zeros(m_system_size);
+
+        // locate data for solution vector
+        m_solution.zeros(m_system_size);
     }
     catch(const std::exception& e)
     {
@@ -112,6 +119,23 @@ template<
             // Write realization
             this->assemble_matrix(local_matrix, e);
             this->assemble_vector(local_rhs, e);
+        }
+
+        // #ifdef NDEBUG
+            m_global_matrix.save("Unassembled HDG", arma::raw_ascii);
+            m_global_vector.save("Unassembled Vector HDG", arma::raw_ascii);
+        // #endif
+
+        if(!m_global_matrix.is_finite())
+        {
+            m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
+            throw std::runtime_error("global matrix have a infinite elem");
+        }
+
+        if(m_global_matrix.has_nan())
+        {
+            m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
+            throw std::runtime_error("global matrix have a nan- elem");
         }
     }
     catch(const std::exception& e)
@@ -182,19 +206,19 @@ template<
     {
         matrix_type phi = arma::zeros(2, 3);
 
-        matrix_type M = arma::zeros(m_dof, m_dof);
+        matrix_type M = arma::zeros(3, 3);
 
         // function for calculate matrix A at point
-        auto A_func = [&equation](const point_2d point){
-            matrix_type A_matr(2,2);
+        // auto A_func = [&equation](const point_2d point){
+        //     matrix_type A_matr(2,2);
 
-            A_matr(0,0) = equation.f_a11(point.x(), point.y()); 
-            A_matr(1,0) = equation.f_a21(point.x(), point.y()); 
-            A_matr(0,1) = equation.f_a12(point.x(), point.y()); 
-            A_matr(1,1) = equation.f_a22(point.x(), point.y());
+        //     A_matr(0,0) = equation.f_a11(point.x(), point.y()); 
+        //     A_matr(1,0) = equation.f_a21(point.x(), point.y()); 
+        //     A_matr(0,1) = equation.f_a12(point.x(), point.y()); 
+        //     A_matr(1,1) = equation.f_a22(point.x(), point.y());
 
-            return A_matr; 
-        };
+        //     return A_matr; 
+        // };
 
         // get edge's centers
         // get list of edges centers
@@ -202,17 +226,29 @@ template<
 
         auto triangle_points = m_mesh->get_points_by_triangle_id(element_index);
 
+        auto triangle_center = m_mesh->get_mass_center(element_index);
+        auto triangle_area   = m_mesh->get_triangle_area(element_index);
+
+        // ****TODO: not finished, how work this formulas?
         // get 2'd order Gauss quadrature points std::pair<tuple<point_2d>, tuple<value_type>>
-        auto quadrature_data  = FEM2D::solvers::features::triquadrature::get_quad_2(triangle_points);
+        //auto quadrature_data  = FEM2D::solvers::features::triquadrature::get_quad_2(triangle_points);
 
-        for(std::size_t s = 0; s < 3; s++)
-        {
-            // get PHI
-            this->get_phi_matrix(phi, triangle_edges_centers[s], m_mesh->get_mass_center(element_index));
+        // for(std::size_t s = 0; s < 3; s++)
+        // {
+        //     // get PHI
+        //     this->get_phi_matrix(phi, triangle_edges_centers[s], m_mesh->get_mass_center(element_index));
 
-            M = M + quadrature_data.second[s] *
-                phi.t() * A_func(quadrature_data.first[s]) * phi;
-        }
+        //     // .t() - transpose function
+        //     matrix_type add_part = quadrature_data.second[s] *
+        //         phi.t() * A_func(quadrature_data.first[s]) * phi;
+        //     M = M + add_part;
+        // }
+
+        auto function_on_tri_center = equation.f_a11(triangle_center.x(), triangle_center.y()); 
+
+        M(0, 0) = function_on_tri_center * triangle_area;
+        M(1, 1) = function_on_tri_center * triangle_area;
+        M(2, 2) = function_on_tri_center * triangle_area * m_mesh->get_l(element_index) / 36;
 
         local_matrix += discrette_derivative.t() * M * discrette_derivative;
 
@@ -245,7 +281,7 @@ template<
             equation.f_f(triangle_edges_centers[0].x(), triangle_edges_centers[0].y()) + 
             equation.f_f(triangle_edges_centers[1].x(), triangle_edges_centers[1].y()) + 
             equation.f_f(triangle_edges_centers[2].x(), triangle_edges_centers[2].y())  
-        ); 
+        );
 
         return true;
     }
@@ -272,9 +308,9 @@ template<
 
         std::vector<std::size_t> assembling_indexes = {
             element_index,
-            std::get<0>(triangle_edge_connectivity),
-            std::get<1>(triangle_edge_connectivity),
-            std::get<2>(triangle_edge_connectivity)
+            m_elems_count + std::get<0>(triangle_edge_connectivity),
+            m_elems_count + std::get<1>(triangle_edge_connectivity),
+            m_elems_count + std::get<2>(triangle_edge_connectivity)
         };
 
         for(std::size_t i = 0; i < 4; i++)
@@ -309,9 +345,9 @@ template<
 
         std::vector<std::size_t> assembling_indexes = {
             element_index,
-            std::get<0>(triangle_edge_connectivity),
-            std::get<1>(triangle_edge_connectivity),
-            std::get<2>(triangle_edge_connectivity)
+            m_elems_count + std::get<0>(triangle_edge_connectivity),
+            m_elems_count + std::get<1>(triangle_edge_connectivity),
+            m_elems_count + std::get<2>(triangle_edge_connectivity)
         };
 
         for(std::size_t i = 0; i < 4; i++)
@@ -378,7 +414,7 @@ template<
         std::for_each(
             boundary_markers.begin(),
             boundary_markers.end(),
-            [&](const auto& marker)
+            [&first_bc_edges, &edge_idx](const auto& marker)
             {
                 if(marker == 1)
                 {
@@ -386,7 +422,11 @@ template<
                 }
                 else if(marker == 3)
                 {
-                    third_bc_edges.insert(edge_idx);
+                    //third_bc_edges.insert(edge_idx);
+                }
+                else if(marker == 0)
+                {
+                    
                 }
                 else
                 {
@@ -442,9 +482,9 @@ bool AssembleHDG<IndexType, ValueType>::assemble_first_bc(
         }
 
         // change rhs vector elements
-        for(std::size_t i = 0; i < m_edges_count; i++)
+        for(std::size_t i = 0; i < m_elems_count + m_edges_count; i++)
         {
-            m_global_vector(offset + i) -= arma::dot(m_global_matrix.row(offset + i), m_solution);
+            m_global_vector(i) -= arma::dot(m_global_matrix.row(i), m_solution);       
         }
 
         // assemble to global matrix
@@ -457,12 +497,14 @@ bool AssembleHDG<IndexType, ValueType>::assemble_first_bc(
 
                 vector_type col(m_system_size);
                 // TODO: rewrite this
-                col(offset + i) = m_solution(i) > 0.00001 ? m_global_vector(i) / m_solution(offset + i) : 1e9;
+                col(offset + i) = (m_solution(offset + i) > 0.00001) ? m_global_vector(offset + i) / m_solution(offset + i) : 1e9;
 
                 m_global_matrix.row(offset + i) = row;
                 m_global_matrix.col(offset + i) = col;
             }
         }
+
+        std::cout << "First BC assembled" << std::endl;
     }
     catch(const std::exception& e)
     {
@@ -476,7 +518,7 @@ bool AssembleHDG<IndexType, ValueType>::assemble_first_bc(
 template<
     typename IndexType,
     typename ValueType
-> void AssembleHDG<IndexType, ValueType>::get_solution_error(const ell_equation_type& equation)
+> bool AssembleHDG<IndexType, ValueType>::get_solution_error(const ell_equation_type& equation)
 {
     // get true solution
     std::vector<value_type> true_solution;
@@ -510,6 +552,8 @@ template<
     );
 
     std::cout << "Max Error is " << error.back() << std::endl;
+
+    return true;
 }
 
 } //

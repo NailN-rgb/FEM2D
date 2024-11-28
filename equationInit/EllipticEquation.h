@@ -172,23 +172,23 @@ public:
     value_type f_b2(value_type x, value_type y) const  { return 0; }
 
 public:
-    value_type f_c1(value_type x, value_type y) const  { return 1; }
-    value_type f_c2(value_type x, value_type y) const  { return 1; }
+    value_type f_c1(value_type x, value_type y) const  { return 0; }
+    value_type f_c2(value_type x, value_type y) const  { return 0; }
 
 public:
-    value_type f_a(value_type x, value_type y) const   { return (2.0 + std::sin((x + y))); }
+    value_type f_a(value_type x, value_type y) const   { return 0; }
 
 public:
     value_type f_f(value_type x, value_type y) const
     {
-        return - 4 * std::cos(2 * (x + y)) +
-            f_c1(x, y) * sol_d1(x, y) +
-            f_c2(x, y) * sol_d2(x, y) + 
-            f_a(x, y) * sol_f(x,y); 
+        return -2 * std::cos(x + y);
     }
 
 public:
-    value_type sol_f(value_type x, value_type y) const {return pow(std::sin((x + y)), 2); }
+    value_type sol_f(value_type x, value_type y) const 
+    {
+        return std::cos(x + y) + 1; 
+    }
 
 public:
     value_type sol_d1(value_type x, value_type y) const 
