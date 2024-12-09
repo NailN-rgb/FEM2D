@@ -111,10 +111,13 @@ template<
     const MeshData& mesh
 )
 {
+    using value_type = typename Vector::value_type;
+
     try
     {
         // get mesh datas
         auto points = mesh->get_points();
+        auto edges  = mesh->get_edges();
         
         std::vector<double> x;
         std::vector<double> y;
@@ -123,7 +126,7 @@ template<
         std::for_each(
             points.cbegin(),
             points.cend(),
-            [&x, &y](const auto& point)
+            [&x, &y, &solution](const auto& point)
             {
                 x.push_back(point.x());
                 y.push_back(point.y());
@@ -131,6 +134,27 @@ template<
         );
 
         matplotlibcpp::scatter(x, y, solution);
+
+        for(std::size_t i = 0; i < edges.size(); i++)
+        {
+            std::vector<value_type> x_e {
+                points[edges[i].first].x(),
+                points[edges[i].second].x()
+            };
+
+            std::vector<value_type> y_e {
+                points[edges[i].first].y(),
+                points[edges[i].second].y()
+            };
+
+            std::vector<value_type> sol {
+                solution[edges[i].first],
+                solution[edges[i].second]
+            };
+
+            matplotlibcpp::plot3(x_e, y_e, sol);            
+        }
+
         const char* filename = "solution.png";
         matplotlibcpp::save(filename);
 

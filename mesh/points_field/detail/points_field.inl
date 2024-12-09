@@ -15,8 +15,8 @@ template<
         bg::append(boundary.outer(), point_2d(0., 1.));
         bg::append(boundary.outer(), point_2d(0., 0.));
 
-        hx = 0.45;
-        hy = 0.45;
+        hx = 0.05;
+        hy = 0.05;
 
         return true;
     }

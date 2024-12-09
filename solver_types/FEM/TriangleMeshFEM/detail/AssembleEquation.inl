@@ -40,7 +40,6 @@ template<
         // solve
         m_solution = arma::solve(m_global_matrix, m_global_vector);
 
-        m_solution.save("Solution.txt", arma::raw_ascii);
 
         std::cout <<
             "Max error: " << 
@@ -48,10 +47,14 @@ template<
         std::endl;
 
         // print mesh & solution
-        FEM2D::Plot::PlotMesh(mesh_data);
-        FEM2D::Plot::PlotExplicitSolution(ell_equation.solution, mesh_data);
-        FEM2D::Plot::PlotSolution(m_solution, mesh_data);
-        
+        // FEM2D::Plot::PlotMesh(mesh_data);
+        // FEM2D::Plot::PlotExplicitSolution(ell_equation.solution, mesh_data);
+        // FEM2D::Plot::PlotSolution(m_solution, mesh_data);
+
+        // print data for visualization
+        write_solutions(ell_equation);
+
+        mesh_data->print_mesh();        
     }
     catch(const std::exception& e)
     {
@@ -270,6 +273,52 @@ template<
     );
 
     return errors_list.back();
+}
+
+
+template<
+    typename IndexType,
+    typename ValueType
+> bool AssembleEquation<IndexType, ValueType>::write_solutions(const ell_equation_type& ell_equation)
+{
+    try
+    {
+        // write calculated solution
+        std::ofstream sol_ofs("calculated_solution.txt");
+        
+        if(!sol_ofs.is_open())
+        {
+            throw std::runtime_error("calculated_solution.txt is closed");
+        }
+
+        for(std::size_t i = 0; i < m_solution.size(); i++)
+        {
+            sol_ofs << m_solution[i] << std::endl;
+        }
+
+        sol_ofs.close();
+
+        // write correct solutions
+
+        std::ofstream cor_sol_ofs("correct_solution.txt");
+        
+        if(!cor_sol_ofs.is_open())
+        {
+            throw std::runtime_error("correct_solution.txt is closed");
+        }
+
+        for(std::size_t i = 0; i < ell_equation.solution.size(); i++)
+        {
+            cor_sol_ofs << ell_equation.solution[i] << std::endl;
+        }
+
+        cor_sol_ofs.close();
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("AssembleEquation::write_solutions " + std::string(e.what()));;
+    }
+    
 }
 
 } //

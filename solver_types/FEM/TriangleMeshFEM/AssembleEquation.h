@@ -128,6 +128,9 @@ private:
         const vector_of_values &calculated_solution
     );
 
+private:
+    bool write_solutions(const ell_equation_type &ell_equaiton);
+
 };
 
 } //

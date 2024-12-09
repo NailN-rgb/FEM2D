@@ -217,6 +217,14 @@ public:
         );
     }
 
+public:
+    bool print_mesh();
+
+public:
+    bool print_nodes();
+    bool print_edges();
+    bool print_triangles();
+
 };
 
 } //

@@ -168,7 +168,7 @@ template<
 
         if(form_vtk)
         {
-            write_mesh_to_vtk();
+            // write_mesh_to_vtk();
         }
     }
     catch(const std::exception& e)
