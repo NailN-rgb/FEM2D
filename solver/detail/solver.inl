@@ -31,7 +31,7 @@ template<
         auto mesh_ptr = mesh.build_mesh(true);
 
         // get pointer-to-solver 
-        auto solver = FEM2D::Factories::SolverFactory<index_type, value_type>::create_solver("FEM");
+        auto solver = FEM2D::Factories::SolverFactory<index_type, value_type>::create_solver("HDG");
 
         if(solver->solve(1, mesh_ptr))
         {
@@ -40,7 +40,7 @@ template<
         
         // select solver type
 
-        std::string solver_type = "FEM";
+        std::string solver_type = "HDG";
 
         // TODO: Code to start solver 
 

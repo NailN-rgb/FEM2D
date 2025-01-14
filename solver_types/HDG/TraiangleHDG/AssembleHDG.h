@@ -28,16 +28,16 @@ class AssembleHDG
 // HDG Method Assembler Class
     using index_type = IndexType;
     using value_type = ValueType;
-    using point_2d = typename bg::geo<value_type>::point_2d;
+    using point_2d   = typename bg::geo<value_type>::point_2d;
 
     using vector_of_values = std::vector<value_type>;
     using tri_edge_list    = std::vector<std::tuple<std::size_t, std::size_t, std::size_t>>;
 
 // mesh type
-    using mesh_type = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
+    using mesh_type         = typename FEM2D::mesh::mesh_types::MeshBase<IndexType, ValueType>;
     using mesh_type_pointer = std::shared_ptr<mesh_type>;
 
-    using ell_equation_type = FEM2D::equation::EllepticEquation<index_type, value_type>;
+    using ell_equation_type         = FEM2D::equation::EllepticEquation<index_type, value_type>;
     using ell_equation_pointer_type = std::shared_ptr<ell_equation_type>;
 
 // boost compressed matrix
@@ -141,6 +141,8 @@ private:
 private:
     bool get_solution_error(const ell_equation_type& equation);
 
+private:
+    bool write_solutions(const ell_equation_type& ell_equation) const;
 };
 
 } //

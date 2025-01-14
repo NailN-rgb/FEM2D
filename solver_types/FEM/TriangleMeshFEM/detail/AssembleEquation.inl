@@ -23,13 +23,16 @@ template<
     {
         // init arrays
         m_nodes_count = mesh_data->get_nodes_size();
+
         m_global_matrix.zeros(m_nodes_count, m_nodes_count);
         m_global_vector.zeros(m_nodes_count);
         m_solution.zeros(m_nodes_count);
 
-        this->create_equation_system(mesh_data, ell_equation);
+        // Fill matrix
+        create_equation_system(mesh_data, ell_equation);
 
-        this->assemble_boundary_conditions(mesh_data, ell_equation);
+        // Assemble boundary conditions
+        assemble_boundary_conditions(mesh_data, ell_equation);
 
         #ifdef NDEBUG
         // m_global_matrix.save("FEM matrix.txt", arma::raw_ascii);
@@ -37,9 +40,8 @@ template<
         // m_global_vector.save("FEM vector.txt", arma::raw_ascii);
         #endif
 
-        // solve
+        // call solver
         m_solution = arma::solve(m_global_matrix, m_global_vector);
-
 
         std::cout <<
             "Max error: " << 
@@ -284,11 +286,11 @@ template<
     try
     {
         // write calculated solution
-        std::ofstream sol_ofs("calculated_solution.txt");
+        std::ofstream sol_ofs("calculated_solution_FEM.txt");
         
         if(!sol_ofs.is_open())
         {
-            throw std::runtime_error("calculated_solution.txt is closed");
+            throw std::runtime_error("calculated_solution_FEM.txt is closed");
         }
 
         for(std::size_t i = 0; i < m_solution.size(); i++)
@@ -300,11 +302,11 @@ template<
 
         // write correct solutions
 
-        std::ofstream cor_sol_ofs("correct_solution.txt");
+        std::ofstream cor_sol_ofs("correct_solution_FEM.txt");
         
         if(!cor_sol_ofs.is_open())
         {
-            throw std::runtime_error("correct_solution.txt is closed");
+            throw std::runtime_error("correct_solution_FEM.txt is closed");
         }
 
         for(std::size_t i = 0; i < ell_equation.solution.size(); i++)
@@ -319,6 +321,7 @@ template<
         throw std::runtime_error("AssembleEquation::write_solutions " + std::string(e.what()));;
     }
     
+    return true;
 }
 
 } //

@@ -25,19 +25,22 @@ template<
         // assemble BC
         assemble_boundary_conditions(equation);
 
-        // #ifdef NDEBUG
-        m_global_matrix.save("HDG matrix.txt", arma::raw_ascii);
+        #ifdef NDEBUG
+            m_global_matrix.save("HDG matrix.txt", arma::raw_ascii);
 
-        m_global_vector.save("HDG vector.txt", arma::raw_ascii);
-        // #endif
+            m_global_vector.save("HDG vector.txt", arma::raw_ascii);
+        #endif
 
         // Solve SLES
         m_solution = arma::solve(m_global_matrix, m_global_vector);
 
         get_solution_error(equation);
-        // postrocessing ?
 
-        // visualization
+        // print solution for visualization
+        write_solutions(equation);
+        m_mesh->print_mesh();
+
+        // TODO: postrocessing ?
     }
     catch(const std::exception& e)
     {
@@ -112,19 +115,19 @@ template<
 
             //this->calculate_A3
 
-            //this->calculate_E
+            //this->calculate_E (convective part)
 
             this->calculate_F_local(equation, local_rhs, e);
 
-            // Write realization
+            // assemble locals to global
             this->assemble_matrix(local_matrix, e);
             this->assemble_vector(local_rhs, e);
         }
 
-        // #ifdef NDEBUG
+        #ifdef NDEBUG
             m_global_matrix.save("Unassembled HDG", arma::raw_ascii);
             m_global_vector.save("Unassembled Vector HDG", arma::raw_ascii);
-        // #endif
+        #endif
 
         if(!m_global_matrix.is_finite())
         {
@@ -544,6 +547,52 @@ template<
 
     std::cout << "Max Error is " << error.back() << std::endl;
 
+    return true;
+}
+
+template<
+    typename IndexType,
+    typename ValueType
+> bool AssembleHDG<IndexType, ValueType>::write_solutions(const ell_equation_type& ell_equation) const
+{
+    try
+    {
+        // write calculated solution
+        std::ofstream sol_ofs("calculated_solution_HDG.txt");
+        
+        if(!sol_ofs.is_open())
+        {
+            throw std::runtime_error("calculated_solution_HDG.txt is closed");
+        }
+
+        for(std::size_t i = 0; i < m_solution.size(); i++)
+        {
+            sol_ofs << m_solution[i] << std::endl;
+        }
+
+        sol_ofs.close();
+
+        // write correct solutions
+        std::ofstream cor_sol_ofs("correct_solution_HDG.txt");
+        
+        if(!cor_sol_ofs.is_open())
+        {
+            throw std::runtime_error("correct_solution_HDG.txt is closed");
+        }
+
+        for(std::size_t i = 0; i < m_mesh->get_edges_size(); i++)
+        {
+            auto edge_center = m_mesh->get_point_by_edge_id(i);
+            cor_sol_ofs << ell_equation.sol_f(edge_center.x(), edge_center.y()) << std::endl;
+        }
+
+        cor_sol_ofs.close();
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error("AssembleEquation::write_solutions " + std::string(e.what()));;
+    }
+    
     return true;
 }
 
